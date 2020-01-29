@@ -20,17 +20,20 @@ namespace aspnet_core_api.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogInformation("Log message in the Index() method");
             return View();
         }
 
         public IActionResult Privacy()
         {
+            _logger.LogInformation("Log message in the Privacy() method");
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            _logger.LogError("Log message in the Error() method");
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
