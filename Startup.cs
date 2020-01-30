@@ -4,17 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using aspnet_core_api.Data;
 
 namespace aspnet_core_api
 {
     public class Startup
     {
+        private static OpenApiContact contact = new OpenApiContact { Email = "patricio.e.arena@gmail.com", Name = "Patricio Ernesto Antonio Arena" };
+        private static OpenApiInfo Info = new OpenApiInfo { Title = "aspnet_core_api", Version = "v1", Contact = contact };
+
         private readonly ILogger _logger;
         public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
@@ -27,10 +32,13 @@ namespace aspnet_core_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddMvc().AddNewtonsoftJson();
             services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc(Info.Version, Info);
             });
             _logger.LogInformation("Added services");
         }
@@ -55,8 +63,8 @@ namespace aspnet_core_api
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                c.RoutePrefix = string.Empty;
+                c.SwaggerEndpoint($"/swagger/{Info.Version}/swagger.json", $"{Info.Title} {Info.Version}");
+                //c.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();
