@@ -18,27 +18,23 @@ namespace aspnet_core_api.Data
             //Database.EnsureCreated();
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(@"Server=.\;Database=EFCoreWebDemo;Trusted_Connection=True;MultipleActiveResultSets=true");
-        //}
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
         }
 
-        public DbSet<PaisModel> Paises { get; set; }
+        public DbSet<DatosPersonales> DatosPersonales { get; set; }
+        public DbSet<Domicilio> Domicilio { get; set; }
+        public DbSet<Experiencia> Experiencia { get; set; }
+        public DbSet<Estudio> Estudio { get; set; }
+        public DbSet<Lenguaje> Idiomas { get; set; }
+        public DbSet<ConAdicioneles> ConocimientosAdicionales { get; set; }
+        public DbSet<ConTecnicos> ConocimientosTecnicos { get; set; }
+
+
+
     }
 
-    public class PaisModel
-    {
-        [Key]
-        public int Id { get; set; }
-        [Required]
-        [StringLength(50, MinimumLength = 3)]
-        public string Nombre { get; set; }
-        public int Habitantes { get; set; }
-    }
+
 
 }
