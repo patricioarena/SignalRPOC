@@ -78,6 +78,7 @@ namespace aspnet_core_api.Data
         public IEnumerable<ConAdicioneles> ConocimientosAdicionales { get; set; }
     }
 
+    [Table("ConocimientosTecnicos", Schema = "dbo")]
     public class ConTecnicos
     {
         [Key]
@@ -108,6 +109,7 @@ namespace aspnet_core_api.Data
         public Guid PersonaID { get; set; }
     }
 
+    [Table("ConocimientosAdicionales", Schema = "dbo")]
     public class ConAdicioneles
     {
         [Key]
@@ -131,6 +133,8 @@ namespace aspnet_core_api.Data
         [Required]
         public Guid PersonaID { get; set; }
     }
+
+    [Table("Idiomas", Schema = "dbo")]
     public class Lenguaje
     {
         [Key]
@@ -166,7 +170,6 @@ namespace aspnet_core_api.Data
         [Required]
         public Guid PersonaID { get; set; }
     }
-
 
     [Table("Domicilio", Schema = "dbo")]
     public class Domicilio
