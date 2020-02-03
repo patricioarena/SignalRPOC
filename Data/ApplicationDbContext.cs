@@ -7,21 +7,33 @@ using Microsoft.EntityFrameworkCore;
 
 using aspnet_core_api.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace aspnet_core_api.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        private IConfigurationRoot Configuration { get; }
+        public ApplicationDbContext() : base() { }
+ 
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //Database.EnsureCreated();
+            if (!optionsBuilder.IsConfigured)
+            {
+                var TT = Configuration.GetConnectionString("DefaultConnection");
+                optionsBuilder.UseSqlite(TT);
+                //optionsBuilder.UseSqlite("Data Source=MyDataSource.db");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
         }
+
 
         public DbSet<DatosPersonales> DatosPersonales { get; set; }
         public DbSet<Domicilio> Domicilio { get; set; }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using aspnet_core_api.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace aspnet_core_api
 {
@@ -21,18 +22,23 @@ namespace aspnet_core_api
         private static OpenApiInfo Info = new OpenApiInfo { Title = "aspnet_core_api", Version = "v1", Contact = contact };
 
         private readonly ILogger _logger;
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
             _logger = logger;
         }
 
-        public IConfiguration Configuration { get; }
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options => 
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IConfiguration>(Configuration);
             services.AddMvc().AddNewtonsoftJson();
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
