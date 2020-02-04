@@ -23,10 +23,18 @@ namespace aspnet_core_api
 
         private readonly ILogger _logger;
         public IConfiguration Configuration { get; }
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger, IHostEnvironment env)
         {
             Configuration = configuration;
             _logger = logger;
+
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(env.ContentRootPath)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+            .AddEnvironmentVariables();
+            Configuration = builder.Build();
+
         }
 
 

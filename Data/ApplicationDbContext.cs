@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
 using aspnet_core_api.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Configuration;
@@ -14,18 +13,18 @@ namespace aspnet_core_api.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        private IConfigurationRoot Configuration { get; }
+        public string _stringConnection { get; set; }
+        public ApplicationDbContext(string stringConnection) : base() { _stringConnection = stringConnection; }
+
         public ApplicationDbContext() : base() { }
- 
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var TT = Configuration.GetConnectionString("DefaultConnection");
-                optionsBuilder.UseSqlite(TT);
-                //optionsBuilder.UseSqlite("Data Source=MyDataSource.db");
+                optionsBuilder.UseSqlite(_stringConnection);
             }
         }
 
@@ -33,7 +32,6 @@ namespace aspnet_core_api.Data
         {
             base.OnModelCreating(builder);
         }
-
 
         public DbSet<DatosPersonales> DatosPersonales { get; set; }
         public DbSet<Domicilio> Domicilio { get; set; }

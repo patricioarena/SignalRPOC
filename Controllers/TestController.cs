@@ -6,6 +6,8 @@ using aspnet_core_api.Data;
 using aspnet_core_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 
 namespace aspnet_core_api.Controllers
@@ -14,9 +16,11 @@ namespace aspnet_core_api.Controllers
     public class TestController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _Configuration;
 
-        public TestController(ApplicationDbContext context)
+        public TestController(ApplicationDbContext context, IConfiguration configuration)
         {
+            _Configuration = configuration;
             _context = context;
         }
 
@@ -60,7 +64,9 @@ namespace aspnet_core_api.Controllers
         [HttpPost]
         public async Task<JObject> PostAsync([FromBody]JObject data)
         {
-            using (var db = new ApplicationDbContext())
+            string stringConnection = _Configuration.GetConnectionString("DefaultConnection");
+
+            using (var db = new ApplicationDbContext(stringConnection))
             {
                 DatosPersonales user = new DatosPersonales();
                 user.PersonaID = (Guid)data.GetValue("personaID");
@@ -110,12 +116,12 @@ namespace aspnet_core_api.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public JObject Delete(int id)
-        {
-            JObject JSON = new JObject();
-            JSON.Add("DELETE", new JObject(new JProperty("id", id)));
-            return JSON;
-        }
+        //[HttpDelete("{id}")]
+        //public JObject Delete(int id)
+        //{
+        //    JObject JSON = new JObject();
+        //    JSON.Add("DELETE", new JObject(new JProperty("id", id)));
+        //    return JSON;
+        //}
     }
 }
