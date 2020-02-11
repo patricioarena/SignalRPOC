@@ -13,8 +13,8 @@ namespace aspnet_core_api.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public string _stringConnection { get; set; }
-        public ApplicationDbContext(string stringConnection) : base() { _stringConnection = stringConnection; }
+        public string _ConnectionString { get; set; }
+        public ApplicationDbContext(string connectionString) : base() { _ConnectionString = connectionString; }
 
         public ApplicationDbContext() : base() { }
 
@@ -24,7 +24,7 @@ namespace aspnet_core_api.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite(_stringConnection);
+                optionsBuilder.UseSqlite(_ConnectionString);
             }
         }
 

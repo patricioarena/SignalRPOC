@@ -15,13 +15,15 @@ namespace aspnet_core_api.Controllers
     [Route("api/[controller]")]
     public class TestController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _Context;
         private readonly IConfiguration _Configuration;
+        private readonly string _ConnectionString;
 
         public TestController(ApplicationDbContext context, IConfiguration configuration)
         {
             _Configuration = configuration;
-            _context = context;
+            _Context = context;
+            _ConnectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         // GET api/values
@@ -33,13 +35,16 @@ namespace aspnet_core_api.Controllers
         //}
 
         //// GET api/values/5
-        //[HttpGet("{id}")]
-        //public JObject Get(int id)
-        //{
-        //    JObject JSON = new JObject();
-        //    JSON.Add("GET", new JObject(new JProperty(new JProperty("id", id))));
-        //    return JSON;
-        //}
+        [HttpGet("{personaID}")]
+        public JObject Get(Guid personaID)
+        {
+            DatosPersonales persona = _Context.DatosPersonales.Where(e => e.PersonaID.Equals(personaID)).FirstOrDefault();
+            String T = Newtonsoft.Json.JsonConvert.SerializeObject(persona);
+
+            JObject JSON = new JObject();
+            JSON.Add("POST", new JObject(new JProperty(new JProperty("value", JObject.Parse(T)))));
+            return JSON;
+        }
 
         // POST api/values
         //[HttpPost]
@@ -64,11 +69,11 @@ namespace aspnet_core_api.Controllers
         [HttpPost]
         public async Task<JObject> PostAsync([FromBody]JObject data)
         {
-            string stringConnection = _Configuration.GetConnectionString("DefaultConnection");
 
-            using (var db = new ApplicationDbContext(stringConnection))
+            using (var db = new ApplicationDbContext(_ConnectionString))
             {
                 DatosPersonales user = new DatosPersonales();
+
                 user.PersonaID = (Guid)data.GetValue("personaID");
                 user.Nombre = data.GetValue("nombre").ToString();
                 user.Apellido = data.GetValue("apellido").ToString();
@@ -76,6 +81,19 @@ namespace aspnet_core_api.Controllers
                 user.TEL = (int)data.GetValue("tel");
                 user.CEL = (int)data.GetValue("cel");
                 user.Email = data.GetValue("email").ToString();
+
+                Domicilio domicilio = data.ToObject<DatosPersonales>().Domicilio;
+                //JObject dom = new JObject(data.GetValue("domicilio"));
+                //domicilio.Pais = dom.GetValue("pais").ToString();
+                //domicilio.Provincia = dom.GetValue("provincia").ToString();
+                //domicilio.Partido = dom.GetValue("partido").ToString();
+                //domicilio.Localidad = dom.GetValue("localidad").ToString();
+                //domicilio.Calle = dom.GetValue("calle").ToString();
+                //domicilio.Numero = (int)dom.GetValue("numero");
+                //domicilio.Piso = (int)dom.GetValue("piso");
+                //domicilio.Depto = dom.GetValue("depto").ToString();
+                //domicilio.CodPostal = (int)dom.GetValue("codPostal");
+
 
                 //user.Nombre = data.Nombre;
                 //user.Apellido = data.Apellido;
@@ -97,7 +115,7 @@ namespace aspnet_core_api.Controllers
                 //Domicilio domicilio = new Domicilio();
 
                 db.DatosPersonales.Add(user);
-                //db.Domicilio.Add(user.Domicilio);
+                db.Domicilio.Add(domicilio);
                 await db.SaveChangesAsync();
             }
 
