@@ -33,22 +33,63 @@ namespace aspnet_core_api.Models
         [RegularExpression(@"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", ErrorMessage = "Email no valido.")]
         public string Email { get; set; }
 
-        [Required, StringLength(50), Column("Domicilio"), Display(Name = "Domicilio"), DataType(DataType.Custom)]
-        public virtual Domicilio Domicilio { get; set; }
+        //[InverseProperty("datosPersonales")]
+        //[Column("Experiencias"), Display(Name = "Experiencias")]
+        //public ICollection<Experiencia> Experiencias { get; set; }
 
-        [Column("Experiencias"), Display(Name = "Experiencias"), ForeignKey("ExperienciaID")]
-        public IEnumerable<Experiencia> Experiencias { get; set; }
+        //[InverseProperty("datosPersonales")]
+        //[Column("Estudios"), Display(Name = "Estudios")]
+        //public ICollection<Estudio> Estudios { get; set; }
 
-        [Column("Estudios"), Display(Name = "Estudios"), ForeignKey("EstudiosID")]
-        public IEnumerable<Estudio> Estudios { get; set; }
+        //[InverseProperty("datosPersonales")]
+        //[Column("Idiomas"), Display(Name = "Idiomas")]
+        //public ICollection<Lenguaje> Idiomas { get; set; }
 
-        [Column("Idiomas"), Display(Name = "Idiomas"), ForeignKey("IdiomasID")]
-        public IEnumerable<Lenguaje> Idiomas { get; set; }
+        //[InverseProperty("datosPersonales")]
+        //[Column("ConTecnicos"), Display(Name = "Conocimientos Tecnicos")]
+        //public ICollection<ConTecnicos> ConocimientosTecnicos { get; set; }
 
-        [Column("ConTecnicos"), Display(Name = "Conocimientos Tecnicos"), ForeignKey("ConAdicionalesID")]
-        public IEnumerable<ConTecnicos> ConocimientosTecnicos { get; set; }
+        //[InverseProperty("datosPersonales")]
+        //[Column("ConAdicioneles"), Display(Name = "Conocimientos Adicionales")]
+        //public ICollection<ConAdicioneles> ConocimientosAdicionales { get; set; }
 
-        [Column("ConAdicioneles"), Display(Name = "Conocimientos Adicionales"), ForeignKey("ConAdicionalesID")]
-        public IEnumerable<ConAdicioneles> ConocimientosAdicionales { get; set; }
+
+
+        //[InverseProperty("datosPersonales")]
+        //[Required, StringLength(50), Column("Domicilio"), Display(Name = "Domicilio"), DataType(DataType.Custom)]
+        //public Guid DomicilioID { get; set; }
+        //public Domicilio Domicilio { get; set; }
+
+
+        [ForeignKey("Domicilio")]
+        [Required, StringLength(50), Column("DomicilioID"), Display(Name = "DomicilioID"), DataType(DataType.Custom)]
+        public Guid DomicilioID { get; set; }
+        public Domicilio Domicilio { get; set; }
+
     }
+
+
+
+    //public class Teacher
+    //{
+    //    public int TeacherId { get; set; }
+    //    public string Name { get; set; }
+
+    //    [InverseProperty("OnlineTeacher")]
+    //    public ICollection<Course> OnlineCourses { get; set; }
+
+    //}
+
+    //public class Course
+    //{
+    //    public int CourseId { get; set; }
+    //    public string CourseName { get; set; }
+    //    public string Description { get; set; }
+
+    //    [ForeignKey("OnlineTeacher")]
+    //    public int? OnlineTeacherId { get; set; }
+    //    public Teacher OnlineTeacher { get; set; }
+
+    //}
+
 }

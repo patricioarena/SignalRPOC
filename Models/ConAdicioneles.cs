@@ -21,8 +21,6 @@ namespace aspnet_core_api.Models
 
         [ForeignKey("PersonaID")]
         public DatosPersonales datosPersonales { get; set; }
-
-        [Required]
         public Guid PersonaID { get; set; }
     }
 }

@@ -23,27 +23,25 @@ namespace aspnet_core_api.Controllers
         {
             _Configuration = configuration;
             _Context = context;
-            _ConnectionString = configuration.GetConnectionString("DefaultConnection");
+            //_ConnectionString = configuration.GetConnectionString("SQLite");
+            _ConnectionString = configuration.GetConnectionString("SQLServer");
+
         }
 
         // GET api/values
-        //[HttpGet]
-        //public string[] Get()
-        //{
-        //    string[] collection = new string[]  { "value1", "value2" };
-        //    return collection;
-        //}
+        [HttpGet]
+        public List<DatosPersonales> Get()
+        {
+            List<DatosPersonales> listaPersonas = _Context.DatosPersonales.Include(dp => dp.Domicilio).ToList();
+            return listaPersonas;
+        }
 
         //// GET api/values/5
         [HttpGet("{personaID}")]
-        public JObject Get(Guid personaID)
+        public DatosPersonales Get(Guid personaID)
         {
-            DatosPersonales persona = _Context.DatosPersonales.Where(e => e.PersonaID.Equals(personaID)).FirstOrDefault();
-            String T = Newtonsoft.Json.JsonConvert.SerializeObject(persona);
-
-            JObject JSON = new JObject();
-            JSON.Add("POST", new JObject(new JProperty(new JProperty("value", JObject.Parse(T)))));
-            return JSON;
+            DatosPersonales persona = _Context.DatosPersonales.Where(e => e.PersonaID.Equals(personaID)).Include(dp => dp.Domicilio).FirstOrDefault();
+            return persona;
         }
 
         // POST api/values
@@ -72,50 +70,16 @@ namespace aspnet_core_api.Controllers
 
             using (var db = new ApplicationDbContext(_ConnectionString))
             {
-                DatosPersonales user = new DatosPersonales();
+                DatosPersonales user = data.ToObject<DatosPersonales>();
+                user.PersonaID = new Guid();
+                user.Domicilio.DomicilioID = new Guid();
 
-                user.PersonaID = (Guid)data.GetValue("personaID");
-                user.Nombre = data.GetValue("nombre").ToString();
-                user.Apellido = data.GetValue("apellido").ToString();
-                user.FechaDeNac = (DateTime)data.GetValue("fechaDeNac");
-                user.TEL = (int)data.GetValue("tel");
-                user.CEL = (int)data.GetValue("cel");
-                user.Email = data.GetValue("email").ToString();
-
-                Domicilio domicilio = data.ToObject<DatosPersonales>().Domicilio;
-                //JObject dom = new JObject(data.GetValue("domicilio"));
-                //domicilio.Pais = dom.GetValue("pais").ToString();
-                //domicilio.Provincia = dom.GetValue("provincia").ToString();
-                //domicilio.Partido = dom.GetValue("partido").ToString();
-                //domicilio.Localidad = dom.GetValue("localidad").ToString();
-                //domicilio.Calle = dom.GetValue("calle").ToString();
-                //domicilio.Numero = (int)dom.GetValue("numero");
-                //domicilio.Piso = (int)dom.GetValue("piso");
-                //domicilio.Depto = dom.GetValue("depto").ToString();
-                //domicilio.CodPostal = (int)dom.GetValue("codPostal");
-
-
-                //user.Nombre = data.Nombre;
-                //user.Apellido = data.Apellido;
-                //user.FechaDeNac = (DateTime)data.FechaDeNac;
-                //user.TEL = (int)data.TEL;
-                //user.CEL = (int)data.CEL;
-                //user.Email = data.Email;
-
-                //user.Domicilio.Pais = data.Domicilio.Pais;
-                //user.Domicilio.Provincia = data.Domicilio.Provincia;
-                //user.Domicilio.Partido = data.Domicilio.Partido;
-                //user.Domicilio.Localidad = data.Domicilio.Localidad;
-                //user.Domicilio.Calle = data.Domicilio.Calle;
-                //user.Domicilio.Numero = data.Domicilio.Numero;
-                //user.Domicilio.Piso = data.Domicilio.Piso;
-                //user.Domicilio.Depto = data.Domicilio.Depto;
-                //user.Domicilio.CodPostal = data.Domicilio.CodPostal;
-
-                //Domicilio domicilio = new Domicilio();
+                //Domicilio domicilio = data.ToObject<DatosPersonales>().Domicilio;
+                //user.domicilio.DomicilioID = new Guid();
 
                 db.DatosPersonales.Add(user);
-                db.Domicilio.Add(domicilio);
+                db.Domicilio.Add(user.Domicilio);
+
                 await db.SaveChangesAsync();
             }
 
