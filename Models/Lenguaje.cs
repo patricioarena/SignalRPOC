@@ -25,8 +25,12 @@ namespace aspnet_core_api.Models
         [Required, Column("NivelOral"), Display(Name = "Nivel Oral"), EnumDataType(typeof(Nivel))]
         public Nivel NivelOral { get; set; }
 
-        [ForeignKey("PersonaID")]
-        public DatosPersonales datosPersonales { get; set; }
+
+
+
+
+        [ForeignKey("Idiomas")]
         public Guid PersonaID { get; set; }
+        public DatosPersonales Idiomas { get; set; }
     }
 }
