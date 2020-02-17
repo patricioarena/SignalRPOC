@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using aspnet_core_api.Data;
 using Microsoft.AspNetCore.Http;
+using System.Reflection;
+using System.IO;
 
 namespace aspnet_core_api
 {
@@ -43,8 +45,8 @@ namespace aspnet_core_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                //options.UseSqlite(Configuration.GetConnectionString("SQLite")));
-                options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
+                options.UseSqlite(Configuration.GetConnectionString("SQLite")));
+                //options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IConfiguration>(Configuration);
@@ -56,7 +58,13 @@ namespace aspnet_core_api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(Info.Version, Info);
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
+
+
+
             _logger.LogInformation("Added services");
         }
 

@@ -40,8 +40,12 @@ namespace aspnet_core_api.Models
         [StringLength(50), Column("Depto"), Display(Name = "Depto"), DataType(DataType.Text)]
         public string Depto { get; set; }
 
-        [InverseProperty("Domicilio")]
-        public DatosPersonales datosPersonales { get; set; }
+
+
+
+        [ForeignKey("Domicilios")]
+        public Guid PersonaID { get; set; }
+        public DatosPersonales Domicilios { get; set; }
 
     }
 }

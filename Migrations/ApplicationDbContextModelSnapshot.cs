@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using aspnet_core_api.Data;
 
@@ -15,30 +14,28 @@ namespace aspnet_core_api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "3.1.1");
 
             modelBuilder.Entity("aspnet_core_api.Models.ConAdicioneles", b =>
                 {
                     b.Property<Guid>("ConAdicionalesID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("ConAdicionalesID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnName("Descripcion")
-                        .HasColumnType("nvarchar(254)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(254);
 
                     b.Property<Guid>("PersonaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasColumnName("Titulo")
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(20);
 
                     b.HasKey("ConAdicionalesID");
@@ -53,24 +50,24 @@ namespace aspnet_core_api.Migrations
                     b.Property<Guid>("ConTecnicosID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("ConTecnicosID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Conocimiento")
                         .IsRequired()
                         .HasColumnName("Conocimiento")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<int>("Nivel")
                         .HasColumnName("Nivel")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("PersonaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Titulo")
                         .HasColumnName("Titulo")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ConTecnicosID");
 
@@ -84,47 +81,41 @@ namespace aspnet_core_api.Migrations
                     b.Property<Guid>("PersonaID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("PersonaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Apellido")
                         .IsRequired()
                         .HasColumnName("Apellido")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
-                    b.Property<int>("CEL")
+                    b.Property<string>("CEL")
+                        .IsRequired()
                         .HasColumnName("CEL")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("DomicilioID")
-                        .HasColumnName("DomicilioID")
-                        .HasColumnType("uniqueidentifier")
-                        .HasMaxLength(50);
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnName("Email")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<DateTime>("FechaDeNac")
                         .HasColumnName("FechaDeNac")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnName("Nombre")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
-                    b.Property<int>("TEL")
+                    b.Property<string>("TEL")
+                        .IsRequired()
                         .HasColumnName("TEL")
-                        .HasColumnType("int");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("PersonaID");
-
-                    b.HasIndex("DomicilioID")
-                        .IsUnique();
 
                     b.ToTable("DatosPersonales","dbo");
                 });
@@ -134,58 +125,63 @@ namespace aspnet_core_api.Migrations
                     b.Property<Guid>("DomicilioID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("DomicilioID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Calle")
                         .IsRequired()
                         .HasColumnName("Calle")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<int>("CodPostal")
                         .HasColumnName("CodPostal")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Depto")
                         .HasColumnName("Depto")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<string>("Localidad")
                         .IsRequired()
                         .HasColumnName("Localidad")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<int>("Numero")
                         .HasColumnName("Numero")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasMaxLength(50);
 
                     b.Property<string>("Pais")
                         .IsRequired()
                         .HasColumnName("Pais")
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(20);
 
                     b.Property<string>("Partido")
                         .IsRequired()
                         .HasColumnName("Partido")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
+
+                    b.Property<Guid>("PersonaID")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Piso")
                         .HasColumnName("Piso")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasMaxLength(50);
 
                     b.Property<string>("Provincia")
                         .IsRequired()
                         .HasColumnName("Provincia")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.HasKey("DomicilioID");
+
+                    b.HasIndex("PersonaID");
 
                     b.ToTable("Domicilio","dbo");
                 });
@@ -195,47 +191,47 @@ namespace aspnet_core_api.Migrations
                     b.Property<Guid>("EstudioID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("EstudioID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ActExtra")
                         .IsRequired()
                         .HasColumnName("ActExtra")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnName("Descripcion")
-                        .HasColumnType("nvarchar(254)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(254);
 
                     b.Property<string>("Disciplina")
                         .IsRequired()
                         .HasColumnName("Disciplina")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<string>("Establecimiento")
                         .IsRequired()
                         .HasColumnName("Establecimiento")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<DateTime>("FechaDeFin")
                         .HasColumnName("FechaDeFin")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaDeInicio")
                         .HasColumnName("FechaDeInicio")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("PersonaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasColumnName("Titulo")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.HasKey("EstudioID");
@@ -250,45 +246,45 @@ namespace aspnet_core_api.Migrations
                     b.Property<Guid>("ExperienciaID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("ExperienciaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Cargo")
                         .IsRequired()
                         .HasColumnName("Cargo")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<string>("Descripcion")
                         .HasColumnName("Descripcion")
-                        .HasColumnType("nvarchar(254)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(254);
 
                     b.Property<string>("Empresa")
                         .IsRequired()
                         .HasColumnName("Empresa")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<DateTime>("FechaDeFin")
                         .HasColumnName("FechaDeFin")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaDeInicio")
                         .HasColumnName("FechaDeInicio")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("PersonaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TipoDeEmpleo")
                         .IsRequired()
                         .HasColumnName("TipoDeEmpleo")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.Property<string>("Ubicacion")
                         .HasColumnName("Ubicacion")
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(50);
 
                     b.HasKey("ExperienciaID");
@@ -303,28 +299,28 @@ namespace aspnet_core_api.Migrations
                     b.Property<Guid>("IdiomasID")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("IdiomasID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Idioma")
                         .IsRequired()
                         .HasColumnName("Idioma")
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(20);
 
                     b.Property<int>("NivelEscrito")
                         .HasColumnName("NivelEscrito")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("NivelLectura")
                         .HasColumnName("NivelLectura")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("NivelOral")
                         .HasColumnName("NivelOral")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("PersonaID")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("IdiomasID");
 
@@ -335,8 +331,8 @@ namespace aspnet_core_api.Migrations
 
             modelBuilder.Entity("aspnet_core_api.Models.ConAdicioneles", b =>
                 {
-                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "datosPersonales")
-                        .WithMany()
+                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "ConocimientosAdicionales")
+                        .WithMany("ConocimientosAdicionales")
                         .HasForeignKey("PersonaID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -344,26 +340,26 @@ namespace aspnet_core_api.Migrations
 
             modelBuilder.Entity("aspnet_core_api.Models.ConTecnicos", b =>
                 {
-                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "datosPersonales")
-                        .WithMany()
+                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "ConocimientosTecnicos")
+                        .WithMany("ConocimientosTecnicos")
                         .HasForeignKey("PersonaID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("aspnet_core_api.Models.DatosPersonales", b =>
+            modelBuilder.Entity("aspnet_core_api.Models.Domicilio", b =>
                 {
-                    b.HasOne("aspnet_core_api.Models.Domicilio", "Domicilio")
-                        .WithOne("datosPersonales")
-                        .HasForeignKey("aspnet_core_api.Models.DatosPersonales", "DomicilioID")
+                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "Domicilios")
+                        .WithMany("Domicilios")
+                        .HasForeignKey("PersonaID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("aspnet_core_api.Models.Estudio", b =>
                 {
-                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "datosPersonales")
-                        .WithMany()
+                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "Estudios")
+                        .WithMany("Estudios")
                         .HasForeignKey("PersonaID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -371,8 +367,8 @@ namespace aspnet_core_api.Migrations
 
             modelBuilder.Entity("aspnet_core_api.Models.Experiencia", b =>
                 {
-                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "datosPersonales")
-                        .WithMany()
+                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "Experiencias")
+                        .WithMany("Experiencias")
                         .HasForeignKey("PersonaID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -380,8 +376,8 @@ namespace aspnet_core_api.Migrations
 
             modelBuilder.Entity("aspnet_core_api.Models.Lenguaje", b =>
                 {
-                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "datosPersonales")
-                        .WithMany()
+                    b.HasOne("aspnet_core_api.Models.DatosPersonales", "Idiomas")
+                        .WithMany("Idiomas")
                         .HasForeignKey("PersonaID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

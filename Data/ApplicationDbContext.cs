@@ -24,8 +24,8 @@ namespace aspnet_core_api.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseSqlite(_ConnectionString);
-                optionsBuilder.UseSqlServer(_ConnectionString);
+                optionsBuilder.UseSqlite(_ConnectionString);
+                //optionsBuilder.UseSqlServer(_ConnectionString);
             }
         }
 

@@ -23,73 +23,39 @@ namespace aspnet_core_api.Models
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime FechaDeNac { get; set; }
 
-        [Required, Column("TEL"), Display(Name = "Tel. Fijo"), DataType(DataType.PhoneNumber)]
-        public int TEL { get; set; }
+        [Required, Column("TEL"), Display(Name = "Tel. Fijo")]
+        public string TEL { get; set; }
 
-        [Required, Column("CEL"), Display(Name = "Tel. Movil"), DataType(DataType.PhoneNumber)]
-        public int CEL { get; set; }
+        [Required, Column("CEL"), Display(Name = "Tel. Movil")]
+        public string CEL { get; set; }
 
         [Required, StringLength(50), Column("Email"), Display(Name = "Correo electronico"), DataType(DataType.EmailAddress)]
         [RegularExpression(@"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", ErrorMessage = "Email no valido.")]
         public string Email { get; set; }
 
-        //[InverseProperty("datosPersonales")]
-        //[Column("Experiencias"), Display(Name = "Experiencias")]
-        //public ICollection<Experiencia> Experiencias { get; set; }
+        [InverseProperty("Domicilios")]
+        [Required, Column("Domicilios"), Display(Name = "Domicilios")]
+        public ICollection<Domicilio> Domicilios { get; set; }
 
-        //[InverseProperty("datosPersonales")]
-        //[Column("Estudios"), Display(Name = "Estudios")]
-        //public ICollection<Estudio> Estudios { get; set; }
+        [InverseProperty("Estudios")]
+        [Column("Estudios"), Display(Name = "Estudios")]
+        public ICollection<Estudio> Estudios { get; set; }
 
-        //[InverseProperty("datosPersonales")]
-        //[Column("Idiomas"), Display(Name = "Idiomas")]
-        //public ICollection<Lenguaje> Idiomas { get; set; }
+        [InverseProperty("Idiomas")]
+        [Column("Idiomas"), Display(Name = "Idiomas")]
+        public ICollection<Lenguaje> Idiomas { get; set; }
 
-        //[InverseProperty("datosPersonales")]
-        //[Column("ConTecnicos"), Display(Name = "Conocimientos Tecnicos")]
-        //public ICollection<ConTecnicos> ConocimientosTecnicos { get; set; }
+        [InverseProperty("Experiencias")]
+        [Column("Experiencias"), Display(Name = "Experiencias")]
+        public ICollection<Experiencia> Experiencias { get; set; }
 
-        //[InverseProperty("datosPersonales")]
-        //[Column("ConAdicioneles"), Display(Name = "Conocimientos Adicionales")]
-        //public ICollection<ConAdicioneles> ConocimientosAdicionales { get; set; }
+        [InverseProperty("ConocimientosTecnicos")]
+        [Column("ConTecnicos"), Display(Name = "Conocimientos Tecnicos")]
+        public ICollection<ConTecnicos> ConocimientosTecnicos { get; set; }
 
-
-
-        //[InverseProperty("datosPersonales")]
-        //[Required, StringLength(50), Column("Domicilio"), Display(Name = "Domicilio"), DataType(DataType.Custom)]
-        //public Guid DomicilioID { get; set; }
-        //public Domicilio Domicilio { get; set; }
-
-
-        [ForeignKey("Domicilio")]
-        [Required, StringLength(50), Column("DomicilioID"), Display(Name = "DomicilioID"), DataType(DataType.Custom)]
-        public Guid DomicilioID { get; set; }
-        public Domicilio Domicilio { get; set; }
+        [InverseProperty("ConocimientosAdicionales")]
+        [Column("ConAdicioneles"), Display(Name = "Conocimientos Adicionales")]
+        public ICollection<ConAdicioneles> ConocimientosAdicionales { get; set; }
 
     }
-
-
-
-    //public class Teacher
-    //{
-    //    public int TeacherId { get; set; }
-    //    public string Name { get; set; }
-
-    //    [InverseProperty("OnlineTeacher")]
-    //    public ICollection<Course> OnlineCourses { get; set; }
-
-    //}
-
-    //public class Course
-    //{
-    //    public int CourseId { get; set; }
-    //    public string CourseName { get; set; }
-    //    public string Description { get; set; }
-
-    //    [ForeignKey("OnlineTeacher")]
-    //    public int? OnlineTeacherId { get; set; }
-    //    public Teacher OnlineTeacher { get; set; }
-
-    //}
-
 }
