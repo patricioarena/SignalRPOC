@@ -89,7 +89,7 @@ namespace aspnet_core_api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint($"/swagger/{Info.Version}/swagger.json", $"{Info.Title} {Info.Version}");
-                //c.RoutePrefix = string.Empty;
+                c.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();
