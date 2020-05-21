@@ -22,9 +22,13 @@ namespace aspnet_core_api.Models
         [Required, Column("Nivel"), Display(Name = "Nivel"), EnumDataType(typeof(Nivel))]
         public Nivel Nivel { get; set; }
 
-        [ForeignKey("PersonaID")]
-        public DatosPersonales datosPersonales { get; set; }
+
+
+
+
+        [ForeignKey("ConocimientosTecnicos")]
         public Guid PersonaID { get; set; }
+        public DatosPersonales ConocimientosTecnicos { get; set; }
     }
 
     public enum Titulo

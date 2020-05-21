@@ -23,8 +23,8 @@ namespace aspnet_core_api.Controllers
         {
             _Configuration = configuration;
             _Context = context;
-            //_ConnectionString = configuration.GetConnectionString("SQLite");
-            _ConnectionString = configuration.GetConnectionString("SQLServer");
+            _ConnectionString = configuration.GetConnectionString("SQLite");
+            //_ConnectionString = configuration.GetConnectionString("SQLServer");
 
         }
 
@@ -32,7 +32,15 @@ namespace aspnet_core_api.Controllers
         [HttpGet]
         public List<DatosPersonales> Get()
         {
-            List<DatosPersonales> listaPersonas = _Context.DatosPersonales.Include(dp => dp.Domicilio).ToList();
+            List<DatosPersonales> listaPersonas = _Context.DatosPersonales
+                    .Include(dp => dp.Domicilios)
+                    .Include(es => es.Estudios)
+                    .Include(idio => idio.Idiomas)
+                    .Include(exp => exp.Experiencias)
+                    .Include(conT => conT.ConocimientosTecnicos)
+                    .Include(conA => conA.ConocimientosTecnicos)
+                    .ToList();
+
             return listaPersonas;
         }
 
@@ -40,7 +48,15 @@ namespace aspnet_core_api.Controllers
         [HttpGet("{personaID}")]
         public DatosPersonales Get(Guid personaID)
         {
-            DatosPersonales persona = _Context.DatosPersonales.Where(e => e.PersonaID.Equals(personaID)).Include(dp => dp.Domicilio).FirstOrDefault();
+            DatosPersonales persona = _Context.DatosPersonales
+                .Where(e => e.PersonaID.Equals(personaID))
+                    .Include(dp => dp.Domicilios)
+                    .Include(es => es.Estudios)
+                    .Include(idio => idio.Idiomas)
+                    .Include(exp => exp.Experiencias)
+                    .Include(conT => conT.ConocimientosTecnicos)
+                    .Include(conA => conA.ConocimientosTecnicos)
+                        .FirstOrDefault();
             return persona;
         }
 
@@ -64,6 +80,80 @@ namespace aspnet_core_api.Controllers
 
 
         // POST api/values/5
+        /// <summary>
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Object Example
+        /// 
+        ///     {
+        ///     "nombre": "Patricio Ernesto Antonio",
+        ///     "apellido": "Arena",
+        ///     "fechaDeNac": "1987-07-09",
+        ///     "tel": "42740810",
+        ///     "cel": "1133142754",
+        ///     "email": "patricio.e.arena@gmail.com",
+        ///     "domicilios": [
+        ///       {
+        ///           "pais": "Argentina",
+        ///           "provincia": "Buenos Aires",
+        ///           "localidad": "Florencio Varela",
+        ///           "partido": "Florencio Varela",
+        ///           "codPostal": 1888,
+        ///           "calle": "Madrid",
+        ///           "numero": 55,
+        ///           "piso": 0,
+        ///           "depto": "-"
+        ///       }
+        ///     ],
+        ///     "estudios": [
+        ///       {
+        ///           "establecimiento": "Universidad Nacional Arturo Jauretche",
+        ///           "titulo": "string",
+        ///           "disciplina": "Ingenieria Informatica",
+        ///           "fechaDeInicio": "2013-04-13",
+        ///           "fechaDeFin": "2032-12-31",
+        ///           "actExtra": "",
+        ///           "descripcion": ""
+        ///       }
+        ///     ],
+        ///     "idiomas": [
+        ///       {
+        ///         "idioma": "Ingles",
+        ///         "nivelEscrito": 1,
+        ///         "nivelLectura": 1,
+        ///         "nivelOral": 1
+        ///       }
+        ///     ],
+        ///     "experiencias": [
+        ///       {
+        ///         "fechaDeInicio": "2020-02-17",
+        ///         "fechaDeFin": "2020-02-17",
+        ///         "cargo": "string",
+        ///         "tipoDeEmpleo": "string",
+        ///         "empresa": "string",
+        ///         "ubicacion": "string",
+        ///         "descripcion": "string"
+        ///       }
+        ///     ],
+        ///     "conocimientosTecnicos": [
+        ///       {
+        ///         "titulo": 1,
+        ///         "conocimiento": "string",
+        ///         "nivel": 1
+        ///       }
+        ///     ],
+        ///     "conocimientosAdicionales": [
+        ///       {
+        ///         "titulo": "string",
+        ///         "descripcion": "string"
+        ///       }
+        ///     ]
+        ///     }
+        ///     
+        /// </remarks>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<JObject> PostAsync([FromBody]JObject data)
         {
@@ -71,15 +161,7 @@ namespace aspnet_core_api.Controllers
             using (var db = new ApplicationDbContext(_ConnectionString))
             {
                 DatosPersonales user = data.ToObject<DatosPersonales>();
-                user.PersonaID = new Guid();
-                user.Domicilio.DomicilioID = new Guid();
-
-                //Domicilio domicilio = data.ToObject<DatosPersonales>().Domicilio;
-                //user.domicilio.DomicilioID = new Guid();
-
                 db.DatosPersonales.Add(user);
-                db.Domicilio.Add(user.Domicilio);
-
                 await db.SaveChangesAsync();
             }
 

@@ -11,27 +11,6 @@ namespace aspnet_core_api.Migrations
                 name: "dbo");
 
             migrationBuilder.CreateTable(
-                name: "Domicilio",
-                schema: "dbo",
-                columns: table => new
-                {
-                    DomicilioID = table.Column<Guid>(nullable: false),
-                    Pais = table.Column<string>(maxLength: 20, nullable: false),
-                    Provincia = table.Column<string>(maxLength: 50, nullable: false),
-                    Localidad = table.Column<string>(maxLength: 50, nullable: false),
-                    Partido = table.Column<string>(maxLength: 50, nullable: false),
-                    CodPostal = table.Column<int>(nullable: false),
-                    Calle = table.Column<string>(maxLength: 50, nullable: false),
-                    Numero = table.Column<int>(maxLength: 50, nullable: false),
-                    Piso = table.Column<int>(maxLength: 50, nullable: false),
-                    Depto = table.Column<string>(maxLength: 50, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Domicilio", x => x.DomicilioID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DatosPersonales",
                 schema: "dbo",
                 columns: table => new
@@ -40,21 +19,13 @@ namespace aspnet_core_api.Migrations
                     Nombre = table.Column<string>(maxLength: 50, nullable: false),
                     Apellido = table.Column<string>(maxLength: 50, nullable: false),
                     FechaDeNac = table.Column<DateTime>(nullable: false),
-                    TEL = table.Column<int>(nullable: false),
-                    CEL = table.Column<int>(nullable: false),
-                    Email = table.Column<string>(maxLength: 50, nullable: false),
-                    DomicilioID = table.Column<Guid>(maxLength: 50, nullable: false)
+                    TEL = table.Column<string>(nullable: false),
+                    CEL = table.Column<string>(nullable: false),
+                    Email = table.Column<string>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DatosPersonales", x => x.PersonaID);
-                    table.ForeignKey(
-                        name: "FK_DatosPersonales_Domicilio_DomicilioID",
-                        column: x => x.DomicilioID,
-                        principalSchema: "dbo",
-                        principalTable: "Domicilio",
-                        principalColumn: "DomicilioID",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,6 +66,35 @@ namespace aspnet_core_api.Migrations
                     table.PrimaryKey("PK_ConocimientosTecnicos", x => x.ConTecnicosID);
                     table.ForeignKey(
                         name: "FK_ConocimientosTecnicos_DatosPersonales_PersonaID",
+                        column: x => x.PersonaID,
+                        principalSchema: "dbo",
+                        principalTable: "DatosPersonales",
+                        principalColumn: "PersonaID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Domicilio",
+                schema: "dbo",
+                columns: table => new
+                {
+                    DomicilioID = table.Column<Guid>(nullable: false),
+                    Pais = table.Column<string>(maxLength: 20, nullable: false),
+                    Provincia = table.Column<string>(maxLength: 50, nullable: false),
+                    Localidad = table.Column<string>(maxLength: 50, nullable: false),
+                    Partido = table.Column<string>(maxLength: 50, nullable: false),
+                    CodPostal = table.Column<int>(nullable: false),
+                    Calle = table.Column<string>(maxLength: 50, nullable: false),
+                    Numero = table.Column<int>(maxLength: 50, nullable: false),
+                    Piso = table.Column<int>(maxLength: 50, nullable: false),
+                    Depto = table.Column<string>(maxLength: 50, nullable: true),
+                    PersonaID = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Domicilio", x => x.DomicilioID);
+                    table.ForeignKey(
+                        name: "FK_Domicilio_DatosPersonales_PersonaID",
                         column: x => x.PersonaID,
                         principalSchema: "dbo",
                         principalTable: "DatosPersonales",
@@ -193,11 +193,10 @@ namespace aspnet_core_api.Migrations
                 column: "PersonaID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DatosPersonales_DomicilioID",
+                name: "IX_Domicilio_PersonaID",
                 schema: "dbo",
-                table: "DatosPersonales",
-                column: "DomicilioID",
-                unique: true);
+                table: "Domicilio",
+                column: "PersonaID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Estudio_PersonaID",
@@ -229,6 +228,10 @@ namespace aspnet_core_api.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "Domicilio",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "Estudio",
                 schema: "dbo");
 
@@ -242,10 +245,6 @@ namespace aspnet_core_api.Migrations
 
             migrationBuilder.DropTable(
                 name: "DatosPersonales",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "Domicilio",
                 schema: "dbo");
         }
     }

@@ -19,8 +19,11 @@ namespace aspnet_core_api.Models
         [Required, StringLength(254), Column("Descripcion"), Display(Name = "Descripcion"), DataType(DataType.MultilineText)]
         public string Descripcion { get; set; }
 
-        [ForeignKey("PersonaID")]
-        public DatosPersonales datosPersonales { get; set; }
+
+
+
+        [ForeignKey("ConocimientosAdicionales")]
         public Guid PersonaID { get; set; }
+        public DatosPersonales ConocimientosAdicionales { get; set; }
     }
 }
