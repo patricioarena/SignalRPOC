@@ -45,8 +45,8 @@ namespace aspnet_core_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("SQLite")));
-                //options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
+                //options.UseSqlite(Configuration.GetConnectionString("SQLite")));
+                options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IConfiguration>(Configuration);
