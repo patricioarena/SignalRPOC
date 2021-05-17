@@ -15,6 +15,7 @@ using aspnet_core_api.Data;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
 using System.IO;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace aspnet_core_api
 {
@@ -36,7 +37,6 @@ namespace aspnet_core_api
             .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
             .AddEnvironmentVariables();
             Configuration = builder.Build();
-
         }
 
 
@@ -45,8 +45,8 @@ namespace aspnet_core_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                //options.UseSqlite(Configuration.GetConnectionString("SQLite")));
-                options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
+                options.UseSqlite(Configuration.GetConnectionString("SQLite")));
+                //options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IConfiguration>(Configuration);
@@ -89,8 +89,11 @@ namespace aspnet_core_api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint($"/swagger/{Info.Version}/swagger.json", $"{Info.Title} {Info.Version}");
-                c.RoutePrefix = string.Empty;
+                c.RoutePrefix = "swagger";
             });
+
+            var rewrite = new RewriteOptions().AddRedirect("^$", "swagger");
+            app.UseRewriter(rewrite);
 
             app.UseRouting();
 
