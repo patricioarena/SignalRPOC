@@ -25,7 +25,6 @@ namespace aspnet_core_api.Controllers
             _Context = context;
             _ConnectionString = configuration.GetConnectionString("SQLite");
             //_ConnectionString = configuration.GetConnectionString("SQLServer");
-
         }
 
         // GET api/values
