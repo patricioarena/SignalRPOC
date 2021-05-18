@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SignalRPOC</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <script type="text/javascript">
+    var notificationsEnabled = false;
+
+    function initNotifications() {
+      if (window.Notification) {
+        Notification.requestPermission(function(permission) {
+          if (permission === 'granted') {
+            notificationsEnabled = true;
+          } else {
+            alert("You denied Notifications, it's so sad :(");
+          }
+        });
+      } else {
+        alert("Your browser doesn't support Notifications API");
+      }
+    }
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
