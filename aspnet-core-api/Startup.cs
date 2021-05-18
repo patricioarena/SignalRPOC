@@ -16,11 +16,17 @@ using Microsoft.AspNetCore.Http;
 using System.Reflection;
 using System.IO;
 using Microsoft.AspNetCore.Rewrite;
+using aspnet_core_api.Signal;
+using aspnet_core_api.Service;
+using aspnet_core_api.IService;
 
 namespace aspnet_core_api
 {
     public class Startup
     {
+        readonly string AllowAll = "_allowAll";
+        private readonly ILogger _Logger;
+
         private static OpenApiContact contact = new OpenApiContact { Email = "patricio.e.arena@gmail.com", Name = "Patricio Ernesto Antonio Arena" };
         private static OpenApiInfo Info = new OpenApiInfo { Title = "aspnet_core_api", Version = "v1", Contact = contact };
 
@@ -44,9 +50,18 @@ namespace aspnet_core_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IMySessionService, MySessionService>();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("SQLite")));
-                //options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
+            //options.UseSqlServer(Configuration.GetConnectionString("SQLServer")));
+
+#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+            var serviceProvider = services.BuildServiceProvider();
+#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
+
+            var logger = serviceProvider.GetService<ILogger<Startup>>();
+            services.AddSingleton(typeof(ILogger), logger);
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IConfiguration>(Configuration);
@@ -63,7 +78,23 @@ namespace aspnet_core_api
                 c.IncludeXmlComments(xmlPath);
             });
 
+            services.AddSignalR( options => {
+                options.EnableDetailedErrors = true;
+            });
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowAll,
+                    builder =>
+                    {
+                        builder
+                        .SetIsOriginAllowed(origin => true) // allow any origin
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        ;
+                    });
+            });
 
             _logger.LogInformation("Added services");
         }
@@ -96,7 +127,7 @@ namespace aspnet_core_api
             app.UseRewriter(rewrite);
 
             app.UseRouting();
-
+            app.UseCors(AllowAll);
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -106,11 +137,16 @@ namespace aspnet_core_api
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseCors(builder => builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                );
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<SignalHub>("/pushNotification").RequireCors(AllowAll);
+            });
+           
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers()
+                    .RequireCors(AllowAll);
+            });
         }
     }
 }

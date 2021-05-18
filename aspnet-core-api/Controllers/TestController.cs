@@ -23,7 +23,7 @@ namespace aspnet_core_api.Controllers
         {
             _Configuration = configuration;
             _Context = context;
-            _ConnectionString = configuration.GetConnectionString("SQLite");
+            //_ConnectionString = configuration.GetConnectionString("SQLite");
             //_ConnectionString = configuration.GetConnectionString("SQLServer");
         }
 
