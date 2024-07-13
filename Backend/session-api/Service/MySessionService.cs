@@ -15,7 +15,6 @@ namespace session_api.Service
             [1] = new UserSession { username = "Charles", value = "H_KEV01cQrFzJdBN-Fx6lA" }
         };
 
-
         public MySessionService() { }
 
         public void SetUserSession(UserSession userSession)
