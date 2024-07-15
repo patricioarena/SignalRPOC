@@ -19,7 +19,7 @@ export class AppComponent implements OnInit, OnDestroy {
   public ngOnInit() {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:44385/pushNotification?connectionName=${this.connectionName}`)
+      .withUrl(`https://localhost:44385/SignalHub?connectionName=${this.connectionName}`)
       .build();
 
     this.hubConnection.start().then(() => {
