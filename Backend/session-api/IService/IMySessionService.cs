@@ -10,9 +10,8 @@ namespace session_api.IService
     {
         void SetUserSession(UserSession userSession);
         bool RemoveUserSession(UserSession userSession);
-        UserSession GetUserSessionByValue(string value);
-        UserSession GetUserSessionByIndex(int index);
-        UserSession GetUserSessionByUsername(string key);
+        UserSession GetUserSessionByConnectionId(string connectionId);
+        UserSession GetUserSessionByUsername(string username);
         Dictionary<int, UserSession> GetUsersSessions();
     }
 }

@@ -127,7 +127,7 @@ namespace session_api
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<SignalHub>("/pushNotification").RequireCors(AllowAll);
+                endpoints.MapHub<SignalHub>("/SignalHub").RequireCors(AllowAll);
             });
 
             app.UseEndpoints(endpoints =>

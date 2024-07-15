@@ -24,7 +24,7 @@ namespace session_api.Signal
             UserSession aUserSession = new UserSession
             {
                 username = connectionName,
-                value = connectionId
+                connectionId = connectionId
             };
 
             _mySessionService.SetUserSession(userSession: aUserSession);
@@ -41,7 +41,7 @@ namespace session_api.Signal
             UserSession aUserSession = new UserSession
             {
                 username = connectionName,
-                value = connectionId
+                connectionId = connectionId
             };
 
             _mySessionService.RemoveUserSession(userSession: aUserSession);
@@ -52,6 +52,5 @@ namespace session_api.Signal
         {
             Clients.Client(connectionId).SendAsync("clientMethodName", $"Updated userid {userId}");
         }
-
     }
 }

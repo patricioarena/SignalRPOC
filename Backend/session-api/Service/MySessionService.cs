@@ -10,62 +10,76 @@ namespace session_api.Service
 {
     public class MySessionService : IMySessionService
     {
-        private readonly new Dictionary<int, UserSession> userList = new Dictionary<int, UserSession>() {
-            [0] = new UserSession { username = "Erik", value = "-eswoeZl3ao8hLANGQwZEQ" },
-            [1] = new UserSession { username = "Charles", value = "H_KEV01cQrFzJdBN-Fx6lA" }
+        private Dictionary<int, UserSession> userList = new Dictionary<int, UserSession>()
+        {
+            [0] = new UserSession { username = "Erik", connectionId = "-eswoeZl3ao8hLANGQwZEQ", sessions = new List<string> { "-eswoeZl3ao8hLANGQwZEQ" } },
+            [1] = new UserSession { username = "Charles", connectionId = "H_KEV01cQrFzJdBN-Fx6lA", sessions = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA" } }
         };
 
         public MySessionService() { }
 
         public void SetUserSession(UserSession userSession)
         {
-            var test = this.GetUserSessionByUsername(userSession.username);
-            if (test != null)
+            var existingUserSession = GetUserSessionByUsername(userSession.username);
+            if (existingUserSession != null)
             {
-                var index = userList.FirstOrDefault(x => x.Value.username == test.username).Key;
-                userList[index] = userSession;
+                UpdateExistingUserSession(existingUserSession, userSession.connectionId);
             }
             else
             {
-                var index = userList.LastOrDefault().Key + 1;
-                userList.Add(index, userSession);
+                AddNewUserSession(userSession);
             }
+        }
+
+        private void UpdateExistingUserSession(UserSession existingUserSession, string connectionId)
+        {
+            var index = userList.FirstOrDefault(x => x.Value.username == existingUserSession.username).Key;
+            userList[index].sessions.Add(connectionId);
+        }
+
+        private void AddNewUserSession(UserSession userSession)
+        {
+            var index = userList.LastOrDefault().Key + 1;
+            userSession.sessions.Add(userSession.connectionId);
+            userList.Add(index, userSession);
         }
 
         public bool RemoveUserSession(UserSession userSession)
         {
-            var test = this.GetUserSessionByUsername(userSession.username);
-            if (test != null)
+            var existingUserSession = GetUserSessionByUsername(userSession.username);
+            if (existingUserSession != null)
             {
-                var index = userList.FirstOrDefault(x => x.Value.username == test.username).Key;
-                userList.Remove(index);
-                return true;
+                return RemoveSessionFromUser(existingUserSession, userSession.connectionId);
             }
             return false;
         }
 
-        public UserSession GetUserSessionByValue(string value)
+        private bool RemoveSessionFromUser(UserSession userSession, string connectionId)
         {
-            var aUserSession =  userList.Where(e => e.Value.value == value).FirstOrDefault().Value;
-            return aUserSession;
+            var index = userList.FirstOrDefault(x => x.Value.username == userSession.username).Key;
+            userSession.sessions.Remove(connectionId);
+
+            if (userSession.sessions.Count == 0)
+            {
+                userList.Remove(index);
+            }
+
+            return true;
         }
 
-        public UserSession GetUserSessionByIndex(int index)
+        public UserSession GetUserSessionByConnectionId(string connectionId)
         {
-            return userList[index];
+            return userList.Values.FirstOrDefault(x => x.connectionId == connectionId);
         }
 
         public UserSession GetUserSessionByUsername(string username)
         {
-            var aUserSession =  userList.Where(e => e.Value.username == username).FirstOrDefault().Value;
-            return aUserSession;
-
+            return userList.Values.FirstOrDefault(x => x.username == username);
         }
 
         public Dictionary<int, UserSession> GetUsersSessions()
         {
             return userList;
         }
-
     }
 }
