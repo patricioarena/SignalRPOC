@@ -1,8 +1,5 @@
 ﻿using session_api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace session_api.IService
 {
@@ -12,6 +9,6 @@ namespace session_api.IService
         bool RemoveUserSession(UserSession userSession);
         UserSession GetUserSessionByConnectionId(string connectionId);
         UserSession GetUserSessionByUsername(string username);
-        Dictionary<int, UserSession> GetUsersSessions();
+        ConcurrentDictionary<int, UserSession> GetUsersSessions();
     }
 }

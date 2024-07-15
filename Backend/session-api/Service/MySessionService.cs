@@ -2,6 +2,7 @@
 using session_api.Models;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace session_api.Service
 {
     public class MySessionService : IMySessionService
     {
-        private Dictionary<int, UserSession> userList = new Dictionary<int, UserSession>()
+        private ConcurrentDictionary<int, UserSession> userList = new ConcurrentDictionary<int, UserSession>()
         {
             [0] = new UserSession { username = "Erik", connectionId = "-eswoeZl3ao8hLANGQwZEQ", sessions = new List<string> { "-eswoeZl3ao8hLANGQwZEQ" } },
             [1] = new UserSession { username = "Charles", connectionId = "H_KEV01cQrFzJdBN-Fx6lA", sessions = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA" } }
@@ -34,14 +35,17 @@ namespace session_api.Service
         private void UpdateExistingUserSession(UserSession existingUserSession, string connectionId)
         {
             var index = userList.FirstOrDefault(x => x.Value.username == existingUserSession.username).Key;
-            userList[index].sessions.Add(connectionId);
+            if (index != default)
+            {
+                userList[index].sessions.Add(connectionId);
+            }
         }
 
         private void AddNewUserSession(UserSession userSession)
         {
-            var index = userList.LastOrDefault().Key + 1;
+            var index = userList.Keys.DefaultIfEmpty(-1).Max() + 1;
             userSession.sessions.Add(userSession.connectionId);
-            userList.Add(index, userSession);
+            userList.TryAdd(index, userSession);
         }
 
         public bool RemoveUserSession(UserSession userSession)
@@ -57,14 +61,18 @@ namespace session_api.Service
         private bool RemoveSessionFromUser(UserSession userSession, string connectionId)
         {
             var index = userList.FirstOrDefault(x => x.Value.username == userSession.username).Key;
-            userSession.sessions.Remove(connectionId);
-
-            if (userSession.sessions.Count == 0)
+            if (index != default)
             {
-                userList.Remove(index);
-            }
+                userSession.sessions.Remove(connectionId);
 
-            return true;
+                if (userSession.sessions.Count == 0)
+                {
+                    userList.TryRemove(index, out _);
+                }
+
+                return true;
+            }
+            return false;
         }
 
         public UserSession GetUserSessionByConnectionId(string connectionId)
@@ -77,7 +85,7 @@ namespace session_api.Service
             return userList.Values.FirstOrDefault(x => x.username == username);
         }
 
-        public Dictionary<int, UserSession> GetUsersSessions()
+        public ConcurrentDictionary<int, UserSession> GetUsersSessions()
         {
             return userList;
         }
