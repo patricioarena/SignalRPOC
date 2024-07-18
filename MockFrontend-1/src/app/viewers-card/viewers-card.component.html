@@ -1,0 +1,48 @@
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<div class="viewers-container">
+  <ng-template #viewerCardTemplate let-usuario>
+    <div class="viewer-card-tooltip">
+      <div class="viewer-card-content">
+        <img class="viewer-card-image" [src]="usuario.imagenUsuario" alt="{{usuario.nombreUsuario}}">
+        <div class="viewer-card-body">
+          <h5 class="viewer-card-title">{{ usuario.nombreUsuario }}</h5>
+          <p class="viewer-card-text">{{ usuario.email }}</p>
+          <p class="viewer-card-text"><i class="far fa-building"></i>  {{ usuario.cargo }}</p>
+        </div>
+      </div>
+      <hr class="viewer-card-divider">
+      <div class="viewer-card-footer">
+        <button class="detail-viewer-button">
+          <i class="fa-regular fa-envelope"></i>
+        </button>
+        <button class="detail-viewer-button">
+          <i class="fa-regular fa-calendar"></i>
+        </button>
+        <button class="detail-viewer-button">
+          <i class="fa-regular fa-comment"></i>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="viewers-thumbnail-container">
+    <ng-container *ngFor="let usuario of usuarios">
+      <div class="viewer-thumbnail-wrapper" (mouseenter)="showViewerCard(usuario)" (mouseleave)="hideViewerCard()">
+        <img class="viewer-thumbnail" [src]="usuario.imagenUsuario" alt="{{usuario.nombreUsuario}}">
+        <ng-container *ngIf="hoveredViewer == usuario">
+          <div class="viewer-card-tooltip-container" (mouseenter)="onViewerCardMouseEnter()" (mouseleave)="onViewerCardMouseLeave()">
+            <ng-container *ngTemplateOutlet="viewerCardTemplate; context: { $implicit: usuario }">
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+
+
+
+
