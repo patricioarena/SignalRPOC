@@ -12,28 +12,38 @@ export class ViewersCardComponent implements OnInit{
   }
 
   @Input() usuarios : Usuario[];
-
   hoveredViewer: Usuario | null = null;
-  keepOpen: boolean = false;
+  private hideTimeout: any;
+  private readonly hideDelay = 5000;
 
-  showViewerCard(usuario: Usuario): void {
-    setTimeout(() => {
-      this.hoveredViewer = usuario;
-    }, 1000);
+  onThumbnailMouseEnter(usuario: Usuario): void {
+    this.clearHideTimeout(); // Limpiar cualquier timeout anterior
+    this.hoveredViewer = usuario;
   }
 
-  hideViewerCard(): void {
-    if (!this.keepOpen){
+  onThumbnailMouseLeave(): void {
+    this.scheduleHideTooltip();
+  }
+
+  onTooltipMouseEnter(): void {
+    this.clearHideTimeout(); // Detener el ocultamiento cuando el mouse entra en la tarjeta
+  }
+
+  onTooltipMouseLeave(): void {
+    this.scheduleHideTooltip();  // Programar el ocultamiento cuando el mouse sale de la tarjeta
+  }
+
+  private scheduleHideTooltip(): void {
+    this.hideTimeout = setTimeout(() => {
       this.hoveredViewer = null;
+    }, this.hideDelay);
+  }
+
+  private clearHideTimeout(): void {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
     }
   }
 
-  onViewerCardMouseEnter(): void {
-    this.keepOpen = true;
-  }
-
-  onViewerCardMouseLeave(): void {
-    this.keepOpen = false;
-    this.hoveredViewer = null;
-  }
 }
