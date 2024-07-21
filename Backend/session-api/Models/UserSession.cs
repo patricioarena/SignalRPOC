@@ -9,8 +9,7 @@ namespace session_api.Models
     [Serializable]
     public class UserSession
     {
-        public string? username { get; set; }
+        public int userId { get; set; }
         public string? connectionId { get; set; }
-        public List<string> sessions { get; set; } = new List<string>();
     }
 }

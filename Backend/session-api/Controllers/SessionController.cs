@@ -30,12 +30,20 @@ namespace session_api.Controllers
 
         }
 
-        [HttpGet("RemoveUserSession/{connectionId}")]
-        public IActionResult RemoveUserSession(string connectionId)
+        [HttpGet("GetUrlListSession")]
+        public IActionResult GetUrlListSession()
         {
-            var aSessionUser = _mySessionService.GetUserSessionByConnectionId(connectionId);
-            var flag = _mySessionService.RemoveUserSession(aSessionUser);
-            return Ok(flag);
+            var dir = _mySessionService.GetUrlListSession();
+            return Ok(dir);
+
         }
+
+        //[HttpGet("RemoveUserSession/{connectionId}")]
+        //public IActionResult RemoveUserSession(string connectionId)
+        //{
+        //    var aSessionUser = _mySessionService.GetUserSessionByConnectionId(connectionId);
+        //    var flag = _mySessionService.RemoveUserSession(aSessionUser);
+        //    return Ok(flag);
+        //}
     }
 }

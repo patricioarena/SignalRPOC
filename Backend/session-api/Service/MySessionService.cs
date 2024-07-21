@@ -6,25 +6,44 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Policy;
 
 namespace session_api.Service
 {
     public class MySessionService : IMySessionService
     {
-        private ConcurrentDictionary<int, UserSession> userList = new ConcurrentDictionary<int, UserSession>()
+        private ConcurrentDictionary<int, User> userList = new ConcurrentDictionary<int, User>()
         {
-            [0] = new UserSession { username = "Erik", connectionId = "-eswoeZl3ao8hLANGQwZEQ", sessions = new List<string> { "-eswoeZl3ao8hLANGQwZEQ" } },
-            [1] = new UserSession { username = "Charles", connectionId = "H_KEV01cQrFzJdBN-Fx6lA", sessions = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA" } }
+            [3456] = new User
+            {
+                userId = 3456,
+                username = "Erik",
+                picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
+                sessions = new List<string> { "-eswoeZl3ao8hLANGQwZEQ" }
+            },
+            [6788] = new User 
+            { 
+                userId = 6788, 
+                username = "Charles", 
+                picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
+                sessions = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA" }
+            }
+        };
+
+        private ConcurrentDictionary<string, List<string>> urlListSession = new ConcurrentDictionary<string, List<string>>()
+        {
+            ["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ" , "H_KEV01cQrFzJdBN-Fx6lA" },
+            ["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" }
         };
 
         public MySessionService() { }
 
         public void SetUserSession(UserSession userSession)
         {
-            var existingUserSession = GetUserSessionByUsername(userSession.username);
-            if (existingUserSession != null)
+            var existingUser = GetUserSessionByUserId(userSession.userId);
+            if (existingUser != null)
             {
-                UpdateExistingUserSession(existingUserSession, userSession.connectionId);
+                UpdateExistingUserSession(userSession, userSession.connectionId);
             }
             else
             {
@@ -32,62 +51,79 @@ namespace session_api.Service
             }
         }
 
-        private void UpdateExistingUserSession(UserSession existingUserSession, string connectionId)
+        public User GetUserSessionByUserId(int userId)
         {
-            var index = userList.FirstOrDefault(x => x.Value.username == existingUserSession.username).Key;
-            if (index != default)
-            {
-                userList[index].sessions.Add(connectionId);
-            }
+            return userList.TryGetValue(userId, out User userSession) ? userSession : null;
         }
 
-        private void AddNewUserSession(UserSession userSession)
+        public List<string> GetListSession(string url)
         {
-            var index = userList.Keys.DefaultIfEmpty(-1).Max() + 1;
-            userSession.sessions.Add(userSession.connectionId);
-            userList.TryAdd(index, userSession);
+            return urlListSession.TryGetValue(url, out List<string> listSession) ? listSession : null;
+        }
+
+        public ConcurrentDictionary<int, User> GetUsersSessions()
+        {
+            return userList;
+        }
+
+        public ConcurrentDictionary<string, List<string>> GetUrlListSession()
+        {
+            return urlListSession;
         }
 
         public bool RemoveUserSession(UserSession userSession)
         {
-            var existingUserSession = GetUserSessionByUsername(userSession.username);
-            if (existingUserSession != null)
+            var existingUser = GetUserSessionByUserId(userSession.userId);
+            if (existingUser != null)
             {
-                return RemoveSessionFromUser(existingUserSession, userSession.connectionId);
+                return RemoveSessionFromUser(existingUser, userSession.connectionId);
             }
             return false;
         }
 
-        private bool RemoveSessionFromUser(UserSession userSession, string connectionId)
+        public void UpdateExistingUsertWithPayload_TEST(Payload payload)
         {
-            var index = userList.FirstOrDefault(x => x.Value.username == userSession.username).Key;
-            if (index != default)
+            var existingList = GetListSession(payload.url);
+            if (existingList != null)
             {
-                userSession.sessions.Remove(connectionId);
-
-                if (userSession.sessions.Count == 0)
-                {
-                    userList.TryRemove(index, out _);
+                if(!urlListSession[payload.url].Contains(payload.connectionId)){
+                    urlListSession[payload.url].Add(payload.connectionId);
                 }
-
-                return true;
             }
-            return false;
         }
 
-        public UserSession GetUserSessionByConnectionId(string connectionId)
+        public void UpdateExistingUsertWithPayload(Payload payload)
         {
-            return userList.Values.FirstOrDefault(x => x.connectionId == connectionId);
+            var existingUser = GetUserSessionByUserId(payload.userId);
+            if (existingUser != null)
+            {
+                if (String.IsNullOrEmpty(userList[payload.userId].username))
+                    userList[payload.userId].username = payload.username;
+
+                if (String.IsNullOrEmpty(userList[payload.userId].picture))
+                    userList[payload.userId].picture = payload.picture;
+            }
         }
 
-        public UserSession GetUserSessionByUsername(string username)
+        private void UpdateExistingUserSession(UserSession existingUserSession, string connectionId)
         {
-            return userList.Values.FirstOrDefault(x => x.username == username);
+            userList[existingUserSession.userId].sessions.Add(connectionId);
         }
 
-        public ConcurrentDictionary<int, UserSession> GetUsersSessions()
+        private void AddNewUserSession(UserSession userSession)
         {
-            return userList;
+            var newUser = new User { userId = userSession.userId, sessions = new List<string> { userSession.connectionId } };
+            userList.TryAdd(newUser.userId, newUser);
+        }
+
+        private bool RemoveSessionFromUser(User user, string connectionId)
+        {
+            var index = user.userId;
+            user.sessions.Remove(connectionId);
+
+            return user.sessions.Count == 0
+                ? userList.TryRemove(index, out _)
+                : false;
         }
     }
 }

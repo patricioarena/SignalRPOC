@@ -25,14 +25,14 @@ namespace session_api.Controllers
         [HttpGet("send/message/to/all")]
         public IActionResult Get()
         {
-            _hubContext.Clients.All.SendAsync("clientMethodName", "Send message to all clients");
+            _hubContext.Clients.All.SendAsync(ClientMethod.Show_Notification, "Send message to all clients");
             return Ok();
         }
 
         [HttpGet("send/message/to/connectionId/{connectionId}")]
         public IActionResult Get(string connectionId)
         {
-            _hubContext.Clients.Client(connectionId).SendAsync("clientMethodName", $"Send message to client { connectionId }");
+            _hubContext.Clients.Client(connectionId).SendAsync(ClientMethod.Show_Notification, $"Send message to client { connectionId }");
             return Ok();
         }
     }

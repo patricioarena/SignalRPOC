@@ -1,14 +1,17 @@
 ﻿using session_api.Models;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace session_api.IService
 {
     public interface IMySessionService
     {
-        void SetUserSession(UserSession userSession);
+        User GetUserSessionByUserId(int userId);
+        ConcurrentDictionary<int, User> GetUsersSessions();
+        ConcurrentDictionary<string, List<string>> GetUrlListSession();
         bool RemoveUserSession(UserSession userSession);
-        UserSession GetUserSessionByConnectionId(string connectionId);
-        UserSession GetUserSessionByUsername(string username);
-        ConcurrentDictionary<int, UserSession> GetUsersSessions();
+        void SetUserSession(UserSession userSession);
+        void UpdateExistingUsertWithPayload(Payload payload);
+        void UpdateExistingUsertWithPayload_TEST(Payload payload);
     }
 }

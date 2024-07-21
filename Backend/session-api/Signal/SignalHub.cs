@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using session_api.IService;
 using session_api.Models;
 using Microsoft.AspNetCore.SignalR;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace session_api.Signal
 {
@@ -19,28 +20,32 @@ namespace session_api.Signal
         public override Task OnConnectedAsync()
         {
             var connectionId = Context.ConnectionId;
-            var connectionName = Context.GetHttpContext().Request.Query["connectionName"];
+            bool exito = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
+
+            //TODO: agregar validacion if exito false
 
             UserSession aUserSession = new UserSession
             {
-                username = connectionName,
+                userId = userId,
                 connectionId = connectionId
             };
 
             _mySessionService.SetUserSession(userSession: aUserSession);
 
-            Clients.Client(connectionId).SendAsync("WelcomeMethodName", $" {connectionId} => {connectionName}");
+            Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, aUserSession);
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var connectionId = Context.ConnectionId;
-            var connectionName = Context.GetHttpContext().Request.Query["connectionName"];
+            bool exito = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
 
+            //TODO: agregar validacion if exito false
+            
             UserSession aUserSession = new UserSession
             {
-                username = connectionName,
+                userId = userId,
                 connectionId = connectionId
             };
 
@@ -48,9 +53,11 @@ namespace session_api.Signal
             return base.OnDisconnectedAsync(exception);
         }
 
-        public void GetDataFromClient(string userId, string connectionId)
+        public async Task ReceivePayload(Payload payload)
         {
-            Clients.Client(connectionId).SendAsync("clientMethodName", $"Updated userid {userId}");
+            _mySessionService.UpdateExistingUsertWithPayload(payload);
+            _mySessionService.UpdateExistingUsertWithPayload_TEST(payload);
+            await Clients.Client(payload.connectionId).SendAsync("ReceivePayloadResponse", payload);
         }
     }
 }
