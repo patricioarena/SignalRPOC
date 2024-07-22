@@ -2,23 +2,23 @@
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <div class="viewers-container">
-  <div class="viewers-thumbnail-container">
+  <!-- <div class="viewers-thumbnail-container"> -->
     <ng-container *ngFor="let usuario of usuarios">
       <div class="viewer-thumbnail-wrapper"
-      (mouseenter)="onThumbnailMouseEnter(usuario)"
-      (mouseleave)="onThumbnailMouseLeave()">
+      (mouseenter)="onMouseEnter(usuario)"
+      (mouseleave)="onMouseLeave()">
         <img class="viewer-thumbnail" [src]="usuario.imagenUsuario" alt="{{usuario.nombreUsuario}}">
-        <ng-container *ngIf="hoveredViewer === usuario">
+        <ng-container *ngIf="hoveredViewer == usuario">
           <div class="viewer-card-tooltip-container"
-          (mouseenter)="onTooltipMouseEnter()"
-          (mouseleave)="onTooltipMouseLeave()">
+          (mouseenter)="onMouseEnter(usuario, true)"
+          (mouseleave)="onMouseLeave()">
             <ng-container *ngTemplateOutlet="viewerCardTemplate; context: { $implicit: usuario }">
             </ng-container>
           </div>
         </ng-container>
       </div>
     </ng-container>
-  </div>
+  <!-- </div> -->
 
   <ng-template #viewerCardTemplate let-usuario>
     <div class="viewer-card-tooltip">

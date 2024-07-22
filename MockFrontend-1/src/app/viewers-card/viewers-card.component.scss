@@ -1,25 +1,38 @@
 .viewers-container{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  // display: flex;
+  // flex-wrap: wrap;
+  // justify-content: space-between;
+  // padding: 10px;
+  // background-color: #2626e0;
+  display: grid;
+  gap: 10px;
   padding: 10px;
   background-color: #2626e0;
+  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+  position: relative;
 }
 
-.viewers-thumbnail-container{
-  display: flex;
-  flex-wrap: wrap;
-}
+// .viewers-thumbnail-container{
+//   // display: flex;
+//   // flex-wrap: wrap;
+//   position: relative;
+//   width: 100%;
+// }
 
 .viewer-thumbnail-wrapper {
+  // position: relative;
+  // margin: 10px;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+  // transition: transform 0.3s ease;
   position: relative;
-  margin: 10px;
-  // display: inline-block;
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: transform 0.3s ease;
-  // align-items: last baseline;
+  margin: 7px;
+  z-index: 1;
 }
 
 .viewer-thumbnail-wrapper:hover {
@@ -28,7 +41,6 @@
 
 //TODO: DARLE ESTILO A CIRCULITOS DE VIEWERS
 .viewer-thumbnail {
-  // margin: 7px;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -47,18 +59,21 @@
   justify-content: center;
   position: absolute;
   z-index: 1;
-  bottom: 130%;
-  left: 50%;
-  transform: translateX(-7%) translateY(160%);
+  bottom: 100%;
+  left: 0%;
+  transform: translateX(7%) translateY(135%);
+  // transform: translateX(-50%) translateY(130%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s ease, pointer-events 0.3s ease;
+  transition: opacity 0.5s, transform 0.5s;
+  padding: 10px;
 }
 
 .viewer-thumbnail-wrapper:hover .viewer-card-tooltip-container,
 .viewer-card-tooltip-container:hover {
   opacity: 1;
   pointer-events: auto;
+  transform: translateX(0) translateY(135%);
 }
 
 .viewer-card-tooltip {
@@ -72,9 +87,10 @@
   border-radius: 8px;
   width: 250px;
   transition: box-shadow 0.3s ease;
-  // margin-top: 10px;
 
   &:hover {
+    opacity: 1;
+    pointer-events: auto;
     box-shadow: 0 0 4px 4px rgba(82, 81, 81, 0.3);
   }
 
