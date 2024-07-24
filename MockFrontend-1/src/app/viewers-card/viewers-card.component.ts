@@ -1,12 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Usuario } from '../Usuario';
+// import { StyleAdjusterService } from '../services/style-adjuster.service';
 
 @Component({
   selector: 'app-viewers-card',
   templateUrl: './viewers-card.component.html',
   styleUrls: ['./viewers-card.component.scss']
 })
-export class ViewersCardComponent implements OnInit{
+export class ViewersCardComponent implements OnInit, AfterViewInit{
+  @ViewChild('viewerCardContainer', { static: false }) viewerCardContainer: ElementRef;
 
   ngOnInit(): void {
   }
@@ -18,11 +20,23 @@ export class ViewersCardComponent implements OnInit{
   private readonly hideDelay = 700;
   private readonly showDelay = 300;
 
+  // private styleAdjuster: StyleAdjusterService
+  constructor() {}
+
+  ngAfterViewInit(){
+    if(this.viewerCardContainer){
+      // this.styleAdjuster.adjustStyles(this.viewerCardContainer.nativeElement)
+    }
+  }
+
   onMouseEnter(usuario: Usuario, isTooltip: boolean = false): void {
     this.clearHideTimeout();
     this.clearShowTimeout();
     this.showTimeout = setTimeout(() => {
       this.hoveredViewer = usuario;
+      // if (isTooltip && this.viewerCardContainer) {
+      //   this.styleAdjuster.adjustStyles(this.viewerCardContainer.nativeElement);
+      // }
     }, this.showDelay);
   }
 
@@ -51,37 +65,5 @@ export class ViewersCardComponent implements OnInit{
       this.showTimeout = null;
     }
   }
-
-  // onThumbnailMouseEnter(usuario: Usuario): void {
-  //   this.clearHideTimeout(); // Limpiar cualquier timeout anterior
-  //   this.hoveredViewer = usuario;
-  //   console.log("thumbnail", usuario)
-  // }
-
-  // onThumbnailMouseLeave(): void {
-  //   this.scheduleHideTooltip();
-  // }
-
-  // onTooltipMouseEnter(): void {
-  //   this.clearHideTimeout(); // Detener el ocultamiento cuando el mouse entra en la tarjeta
-  // }
-
-  // private scheduleHideTooltip(): void {
-  //   this.clearHideTimeout();
-  //   this.hideTimeout = setTimeout(() => {
-  //     this.hoveredViewer = null;
-  //   }, this.hideDelay);
-  // }
-
-  // onTooltipMouseLeave(): void {
-  //   this.scheduleHideTooltip();  // Programar el ocultamiento cuando el mouse sale de la tarjeta
-  // }
-
-  // private clearHideTimeout(): void {
-  //   if (this.hideTimeout) {
-  //     clearTimeout(this.hideTimeout);
-  //     this.hideTimeout = null;
-  //   }
-  // }
 
 }

@@ -39,24 +39,14 @@
 }
 
 .viewer-card-tooltip-container {
-  // display: flex;
-  // justify-content: center;
-  // position: absolute;
-  // // z-index: 1;
-  // bottom: 100%;
-  // left: 0;
-  // transform: translateX(-50%);
-  // pointer-events: none;
-  // opacity: 0;
-  // transition: opacity 0.5s, transform 0.5s;
-
   position: absolute;
   bottom: 100%;
   padding-bottom: 1rem;
   transition: opacity .4s, bottom .4s cubic-bezier(.6, -.5, .3, 1.5);
   pointer-events: none;
-  opacity: 0;
+  // opacity: 0;
   padding: 10px;
+  // max-width: 300px; /* Nuevo estilo */
 
   .viewer-card-tooltip {
     display: flex;
@@ -179,25 +169,15 @@
       }
     }
   }
-
-  .viewer-thumbnail-wrapper:hover &,
-  &:hover {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(10%) translateY(135%);
-  }
 }
 
-/* Estado inicial cuando el tooltip está oculto */
 .viewer-thumbnail-wrapper .viewer-card-tooltip-container {
-  transform: translateX(-50%) translateY(215px); /* Posiciona el tooltip 20px debajo */
+  transform: translateX(-40%) translateY(220px);
 }
 
-
-/* Estado cuando se hace hover sobre el thumbnail */
 .viewer-thumbnail-wrapper:hover .viewer-card-tooltip-container,
 .viewer-card-tooltip-container:hover {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(215px); /* Mueve el tooltip a su lugar final */
+  transform: translateX(-40%) translateY(220px);
 }
