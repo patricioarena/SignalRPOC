@@ -10,7 +10,7 @@
         <div class="viewer-thumbnail-image">
           <img class="viewer-thumbnail-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
           <ng-container *ngIf="hoveredViewer === usuario">
-            <div class="viewer-card-tooltip-container" appTooltipAdjust #viewerCardContainer (mouseenter)="onMouseEnter(usuario, true)" (mouseleave)="onMouseLeave()">
+            <div class="viewer-card-tooltip-container" appTooltipAdjust [appTooltipAdjust]="true" #viewerCardContainer (mouseenter)="onMouseEnter(usuario, true)" (mouseleave)="onMouseLeave()">
               <ng-container *ngTemplateOutlet="viewerCardTemplate; context: { $implicit: usuario }"></ng-container>
             </div>
           </ng-container>

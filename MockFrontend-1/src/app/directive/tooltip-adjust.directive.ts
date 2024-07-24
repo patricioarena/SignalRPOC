@@ -21,8 +21,8 @@ export class TooltipAdjustDirective implements AfterViewInit{
   onWindowResize(){
     console.log("ONWINDOWRESIZE")
     this.adjustTooltipPosition();
-    // this.setCardMaxWidth();
-    // this.setCardContentWidth();
+    this.setCardMaxWidth();
+    this.setCardContentWidth();
   }
 
   adjustTooltipPosition() {
@@ -46,14 +46,20 @@ export class TooltipAdjustDirective implements AfterViewInit{
 
   private setCardMaxWidth(): void {
     const element = this.element.nativeElement;
-    this.renderer.setStyle(element, 'max-width', '50px');
+    this.renderer.setStyle(element, 'max-width', '300px');
   }
 
   private setCardContentWidth(): void {
     const element = this.element.nativeElement;
     const textElements = element.querySelectorAll('.viewer-card-body, .viewer-card-body *');
+    // Ajustar el ancho máximo del contenedor del texto
+    this.renderer.setStyle(element.querySelector('.viewer-card-body'), 'max-width', '150px');
     textElements.forEach((textElement: HTMLElement) => {
-      this.renderer.setStyle(textElement, 'max-width', '50px');
+      // Ajustar el ancho máximo de los elementos de texto
+      this.renderer.setStyle(textElement, 'max-width', '150px');
+
+      // Ajustar el tamaño de la fuente del texto (puedes personalizar este valor)
+      this.renderer.setStyle(textElement, 'font-size', '14px');
     });
   }
 }
