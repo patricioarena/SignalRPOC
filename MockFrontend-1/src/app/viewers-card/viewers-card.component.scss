@@ -3,10 +3,27 @@
 .viewers-container {
   position: relative;
   display: grid;
-  gap: 10px;
+  // gap: 10px;
   padding: 10px;
   background-color: var(--container-color);
   grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+  max-width: 300px;
+  // overflow: hidden;
+}
+
+.viewers-container__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Tamaño del icono */
+  height: 30px; /* Tamaño del icono */
+  background-color: var(--icon-background-color, #f0f0f0); /* Color de fondo del icono */
+  border-radius: 50%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .viewer-thumbnail-wrapper {
@@ -40,13 +57,16 @@
 
 .viewer-card-tooltip-container {
   position: absolute;
-  bottom: 100%;
+  min-width: 200px;
+  max-width: 300px;
+  bottom: calc(100% + 4px); /* Ajusta la posición vertical con un margen */
+  left: 50%; /* Centro horizontal */
+  // transform: translateX(-50%); /* Centrar el tooltip horizontalmente */
   padding-bottom: 1rem;
-  transition: opacity .4s, bottom .4s cubic-bezier(.6, -.5, .3, 1.5);
+  //transition: opacity .4s, bottom .4s cubic-bezier(.6, -.5, .3, 1.5);
   pointer-events: none;
   // opacity: 0;
   padding: 10px;
-  // max-width: 300px; /* Nuevo estilo */
 
   .viewer-card-tooltip {
     display: flex;
@@ -67,7 +87,7 @@
     .viewer-card-content {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       width: 100%;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 0.5rem;
@@ -172,12 +192,17 @@
 }
 
 .viewer-thumbnail-wrapper .viewer-card-tooltip-container {
-  transform: translateX(-40%) translateY(220px);
+  transform: translateX(-20%) translateY(220px);
+  // transform: translateX(-50%) translateY(calc(100% + 10px));
+  // /* Ajuste con `calc` para una mejor control de la posición vertical */
 }
 
 .viewer-thumbnail-wrapper:hover .viewer-card-tooltip-container,
 .viewer-card-tooltip-container:hover {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-40%) translateY(220px);
+  transform: translateX(-20%) translateY(220px);
+  // opacity: 1;
+  // pointer-events: auto;
+  // transform: translateX(-50%) translateY(calc(100% + 10px));
 }

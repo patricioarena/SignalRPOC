@@ -13,10 +13,13 @@ import { Usuario } from './Usuario';
 export class AppComponent implements OnInit, OnDestroy {
 
   usuarios: Usuario[] = [
-    { nombreUsuario: "jdoe", idUsuario: 1, email: "jdoe@exampleeeeeeeeeeee.com", cargo: "Desarrollador", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/65.jpg" },
+    { nombreUsuario: "jdoe", idUsuario: 1, email: "jdoe@example.com", cargo: "Desarrollador", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/65.jpg" },
     { nombreUsuario: "asmith", idUsuario: 2, email: "asmith@example.com", cargo: "Diseñador", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/44.jpg" },
     { nombreUsuario: "mjohnson", idUsuario: 3, email: "mjohnson@example.com", cargo: "Gerente", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/41.jpg" },
     { nombreUsuario: "krodriguez", idUsuario: 4, email: "krodriguez@example.com", cargo: "Administrador", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/46.jpg" },
+    { nombreUsuario: "fbrown", idUsuario: 5, email: "fbrown@example.com", cargo: "Soporte Técnico", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/37.jpg" },
+    { nombreUsuario: "fbrown", idUsuario: 5, email: "fbrown@example.com", cargo: "Soporte Técnico", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/37.jpg" },
+    { nombreUsuario: "fbrown", idUsuario: 5, email: "fbrown@example.com", cargo: "Soporte Técnico", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/37.jpg" },
     { nombreUsuario: "fbrown", idUsuario: 5, email: "fbrown@example.com", cargo: "Soporte Técnico", imagenUsuario: "https://mighty.tools/mockmind-api/content/human/37.jpg" }
   ];
 

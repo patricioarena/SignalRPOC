@@ -19,6 +19,8 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
   private showTimeout: any;
   private readonly hideDelay = 700;
   private readonly showDelay = 300;
+  private visibleUserCount = 4; // Número máximo de usuarios visibles inicialmente
+  private showAll = false; // Flag para mostrar todos los usuarios
 
   // private styleAdjuster: StyleAdjusterService
   constructor() {}
@@ -34,9 +36,6 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
     this.clearShowTimeout();
     this.showTimeout = setTimeout(() => {
       this.hoveredViewer = usuario;
-      // if (isTooltip && this.viewerCardContainer) {
-      //   this.styleAdjuster.adjustStyles(this.viewerCardContainer.nativeElement);
-      // }
     }, this.showDelay);
   }
 
@@ -66,4 +65,19 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
     }
   }
 
+  // Método para alternar la visibilidad de los usuarios
+  toggleUsers() {
+    this.showAll = !this.showAll;
+    this.visibleUserCount = this.showAll ? this.usuarios.length : 4;
+  }
+
+  // Obtener usuarios visibles en función del estado
+  get visibleUsers() {
+    return this.usuarios.slice(0, this.visibleUserCount);
+  }
+
+  // Determinar si se debe mostrar el icono de "más"
+  get showMoreIcon() {
+    return !this.showAll && this.usuarios.length > 4;
+  }
 }
