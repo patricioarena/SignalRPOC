@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Rewrite;
 using session_api.Signal;
 using session_api.Service;
 using session_api.IService;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Linq;
 
 namespace session_api
 {
@@ -40,24 +42,17 @@ namespace session_api
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "ASP0000:Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'", Justification = "<pendiente>")]
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<IUrlSessionService, UrlSessionService>();
-            services.AddSingleton<ISessionUserService, SessionUserService>();
-
-#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-            var serviceProvider = services.BuildServiceProvider();
-#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-
-            var logger = serviceProvider.GetService<ILogger<Startup>>();
-            services.AddSingleton(typeof(ILogger), logger);
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton(typeof(ILogger), services.BuildServiceProvider().GetService<ILogger<Startup>>());
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddMvc().AddNewtonsoftJson(
-                options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                );
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IUrlConnectionService, UrlConnectionService>();
+            services.AddSingleton<IConnectionUserService, ConnectionUserService>();
+
+            services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
             services.AddSwaggerGen(c =>
@@ -66,9 +61,11 @@ namespace session_api
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+                c.DocumentFilter<LowercaseDocumentFilter>();
             });
 
-            services.AddSignalR( options => {
+            services.AddSignalR(options =>
+            {
                 options.EnableDetailedErrors = true;
             });
 

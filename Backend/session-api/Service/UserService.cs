@@ -20,30 +20,26 @@ namespace session_api.Service
                 userId = 3456,
                 username = "Erik",
                 picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
-                sessions = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
+                connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
             },
             [6788] = new User 
             { 
                 userId = 6788, 
                 username = "Charles", 
                 picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
-                sessions = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
+                connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
             }
         };
 
         public UserService() { }
 
-        public void SetUserSession(UserSession userSession)
+        public void SetCurrentConnection(UserConnection userConnection)
         {
-            var existingUser = GetUserByUserId(userSession.userId);
-            if (existingUser != null)
-            {
-                UpdateExistingUserSession(userSession, userSession.connectionId);
-            }
-            else
-            {
-                AddNewUserSession(userSession);
-            }
+            var existingUser = GetUserByUserId(userConnection.userId);
+            Action action = (existingUser != null)
+                ? new Action(() => UpdateExistingUserWithCurrentConnection(userConnection, userConnection.connectionId))
+                : new Action(() => AddNewUserWithCurrentConnection(userConnection));
+            action();
         }
 
         public User GetUserByUserId(int userId)
@@ -51,17 +47,17 @@ namespace session_api.Service
             return users.TryGetValue(userId, out User userSession) ? userSession : null;
         }
 
-        public ConcurrentDictionary<int, User> GetUsers()
+        public ConcurrentDictionary<int, User> GetAll()
         {
             return users;
         }
 
-        public Task RemoveUserSession(UserSession userSession)
+        public Task RemoveCurrentConnection(UserConnection userConnection)
         {
-            var existingUser = GetUserByUserId(userSession.userId);
+            var existingUser = GetUserByUserId(userConnection.userId);
             if (existingUser != null)
             {
-                if (RemoveSessionFromUser(existingUser, userSession.connectionId))
+                if (RemoveConnectionFromUser(existingUser, userConnection.connectionId))
                     return Task.CompletedTask;
                 return Task.FromException(new InvalidOperationException());
             }
@@ -94,25 +90,25 @@ namespace session_api.Service
             }
         }
 
-        private void UpdateExistingUserSession(UserSession existingUserSession, string connectionId)
+        private void UpdateExistingUserWithCurrentConnection(UserConnection existingUserConnection, string connectionId)
         {
-            users[existingUserSession.userId].sessions.Add(connectionId);
+            users[existingUserConnection.userId].connections.Add(connectionId);
         }
 
-        private void AddNewUserSession(UserSession userSession)
+        private void AddNewUserWithCurrentConnection(UserConnection userSession)
         {
-            var newUser = new User { userId = userSession.userId, sessions = new List<string> { userSession.connectionId } };
+            var newUser = new User { userId = userSession.userId, connections = new List<string> { userSession.connectionId } };
             users.TryAdd(newUser.userId, newUser);
         }
 
-        private bool RemoveSessionFromUser(User user, string connectionId)
+        private bool RemoveConnectionFromUser(User user, string connectionId)
         {
             var index = user.userId;
-            user.sessions.Remove(connectionId);
+            user.connections.Remove(connectionId);
 
-            return user.sessions.Count == 0
+            return user.connections.Count == 0
                 ? users.TryRemove(index, out _)
                 : false;
         }
-    }
+   }
 }

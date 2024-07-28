@@ -9,8 +9,8 @@ using System.Collections.Generic;
 namespace session_api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
     [EnableCors("AllowAll")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class NotificationController : ControllerBase
     {
         private IHubContext<SignalHub> _hubContext;

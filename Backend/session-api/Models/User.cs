@@ -12,6 +12,6 @@ namespace session_api.Models
         public int userId { get; set; }
         public string? username { get; set; }
         public string? picture { get; set; }
-        public List<string> sessions { get; set; } = new List<string>();
+        public List<string> connections { get; set; } = new List<string>();
     }
 }

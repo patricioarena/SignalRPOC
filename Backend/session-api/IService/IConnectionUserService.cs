@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace session_api.IService;
-public interface ISessionUserService
+public interface IConnectionUserService
 {
-    ConcurrentDictionary<string, UserUrl> GetSessionsOfUsers();
     UserUrl GetUserIdByConnectionId(string connectionId);
+    ConcurrentDictionary<string, UserUrl> GetAll();
     Task AddMapConnectionIdUserId(Payload payload);
 }

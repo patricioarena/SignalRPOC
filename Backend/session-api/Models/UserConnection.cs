@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace session_api.Models
 {
     [Serializable]
-    public class UserSession
+    public class UserConnection
     {
         public int userId { get; set; }
         public string? connectionId { get; set; }

@@ -8,9 +8,9 @@ namespace session_api.IService
     public interface IUserService
     {
         User GetUserByUserId(int userId);
-        ConcurrentDictionary<int, User> GetUsers();
-        Task RemoveUserSession(UserSession userSession);
-        void SetUserSession(UserSession userSession);
+        ConcurrentDictionary<int, User> GetAll();
+        Task RemoveCurrentConnection(UserConnection userConnection);
+        void SetCurrentConnection(UserConnection userConnection);
         Task UpdateUserIfEmptyFields(Payload payload);
     }
 }

@@ -12,14 +12,14 @@ namespace session_api.Signal
     public class SignalHub : Hub
     {
         public IUserService _userService { get; set; }
-        public IUrlSessionService _urlSessionService { get; set; }
-        public ISessionUserService _sessionUserService { get; set; }
+        public IUrlConnectionService _urlConnectionService { get; set; }
+        public IConnectionUserService _connectionUserService { get; set; }
 
-        public SignalHub(IUserService mySessionService, IUrlSessionService urlSessionService, ISessionUserService sessionUserService)
+        public SignalHub(IUserService mySessionService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
         {
             _userService = mySessionService;
-            _urlSessionService = urlSessionService;
-            _sessionUserService = sessionUserService;
+            _urlConnectionService = urlConnectionService;
+            _connectionUserService = connectionUserService;
         }
 
         public override Task OnConnectedAsync()
@@ -29,15 +29,15 @@ namespace session_api.Signal
 
             //TODO: agregar validacion if exito false
 
-            UserSession aUserSession = new UserSession
+            UserConnection aUserConnection = new UserConnection
             {
                 userId = userId,
                 connectionId = connectionId
             };
 
-            _userService.SetUserSession(userSession: aUserSession);
+            _userService.SetCurrentConnection(userConnection: aUserConnection);
 
-            Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, aUserSession);
+            Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, aUserConnection);
             return base.OnConnectedAsync();
         }
 
@@ -48,13 +48,13 @@ namespace session_api.Signal
 
             //TODO: agregar validacion if exito false
 
-            UserSession aUserSession = new UserSession
+            UserConnection aUserConnection = new UserConnection
             {
                 userId = userId,
                 connectionId = connectionId
             };
 
-            _userService.RemoveUserSession(userSession: aUserSession);
+            _userService.RemoveCurrentConnection(userConnection: aUserConnection);
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -72,7 +72,7 @@ namespace session_api.Signal
                     LogTaskError(task);
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception); // Propaga el error
-                    await _urlSessionService.AddConnectionToUserSessionIfNotExist(payload);
+                    await _urlConnectionService.AddConnectionToListConnectionsIfNotExist(payload);
                 })
                 .Unwrap() // Desenrolla el Task<Task> devuelto por ContinueWith
                 .ContinueWith(async task =>
@@ -80,7 +80,7 @@ namespace session_api.Signal
                     LogTaskError(task);
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception); // Propaga el error
-                    await _sessionUserService.AddMapConnectionIdUserId(payload);
+                    await _connectionUserService.AddMapConnectionIdUserId(payload);
                 })
                 .Unwrap() // Desenrolla el Task<Task> devuelto por ContinueWith
                 .ContinueWith(LogTaskError); // Maneja cualquier error final

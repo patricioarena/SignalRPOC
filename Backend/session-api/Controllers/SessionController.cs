@@ -9,52 +9,50 @@ using System.Collections.Generic;
 namespace session_api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
     [EnableCors("AllowAll")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class SessionController : ControllerBase
     {
         private IHubContext<SignalHub> _hubContext;
         private IUserService _userService { get; set; }
-        private IUrlSessionService _urlSessionService { get; set; }
-        private ISessionUserService _sessionUserService { get; set; }
+        private IUrlConnectionService _urlConnectionService { get; set; }
+        private IConnectionUserService _connectionUserService { get; set; }
 
-        public SessionController(IHubContext<SignalHub> hubContext, IUserService mySessionService, IUrlSessionService urlSessionService, ISessionUserService sessionUserService)
+        public SessionController(IHubContext<SignalHub> hubContext, IUserService userService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
         {
             _hubContext = hubContext;
-            _userService = mySessionService;
-            _urlSessionService = urlSessionService;
-            _sessionUserService = sessionUserService;
+            _userService = userService;
+            _urlConnectionService = urlConnectionService;
+            _connectionUserService = connectionUserService;
         }
 
-        [HttpGet("GetUsers")]
+        [HttpGet("Get/All/Users")]
         public IActionResult GetUsers()
         {
-            var dir = _userService.GetUsers();
+            var dir = _userService.GetAll();
             return Ok(dir);
 
         }
 
-        [HttpGet("GetUrlListSession")]
-        public IActionResult GetUrlListSession()
+        [HttpGet("Get/All/Url/And/List/Connections")]
+        public IActionResult GetUrlListConnections()
         {
-            var dir = _urlSessionService.GetUrlListSession();
+            var dir = _urlConnectionService.GetAll();
             return Ok(dir);
         }
 
-        [HttpGet("GetSessionsOfUsers")]
-        public IActionResult GetSessionsOfUsers()
+        [HttpGet("Get/All/Connection/User")]
+        public IActionResult GetConnectionUser()
         {
-            var dir = _sessionUserService.GetSessionsOfUsers();
+            var dir = _connectionUserService.GetAll();
             return Ok(dir);
 
         }
 
-        //[HttpGet("RemoveUserSession/{connectionId}")]
-        //public IActionResult RemoveUserSession(string connectionId)
-        //{
-        //    var aSessionUser = _userService.GetUserSessionByConnectionId(connectionId);
-        //    var flag = _userService.RemoveUserSession(aSessionUser);
-        //    return Ok(flag);
-        //}
+        [HttpGet("Remove/Connection/{connectionId}/of/User/{userId}")]
+        public IActionResult RemoveCurrentConnection(string connectionId)
+        {
+            return Ok(connectionId);
+        }
     }
 }
