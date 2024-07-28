@@ -15,9 +15,9 @@ namespace session_api.Signal
         public IUrlConnectionService _urlConnectionService { get; set; }
         public IConnectionUserService _connectionUserService { get; set; }
 
-        public SignalHub(IUserService mySessionService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
+        public SignalHub(IUserService userService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
         {
-            _userService = mySessionService;
+            _userService = userService;
             _urlConnectionService = urlConnectionService;
             _connectionUserService = connectionUserService;
         }
