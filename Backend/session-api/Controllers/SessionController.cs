@@ -14,18 +14,22 @@ namespace session_api.Controllers
     public class SessionController : ControllerBase
     {
         private IHubContext<SignalHub> _hubContext;
-        public IMySessionService _mySessionService { get; set; }
+        private IUserService _userService { get; set; }
+        private IUrlSessionService _urlSessionService { get; set; }
+        private ISessionUserService _sessionUserService { get; set; }
 
-        public SessionController(IHubContext<SignalHub> hubContext, IMySessionService mySessionService)
+        public SessionController(IHubContext<SignalHub> hubContext, IUserService mySessionService, IUrlSessionService urlSessionService, ISessionUserService sessionUserService)
         {
             _hubContext = hubContext;
-            _mySessionService = mySessionService;
+            _userService = mySessionService;
+            _urlSessionService = urlSessionService;
+            _sessionUserService = sessionUserService;
         }
 
-        [HttpGet("GetUsersSessions")]
-        public IActionResult GetUsersSessions()
+        [HttpGet("GetUsers")]
+        public IActionResult GetUsers()
         {
-            var dir = _mySessionService.GetUsersSessions();
+            var dir = _userService.GetUsers();
             return Ok(dir);
 
         }
@@ -33,7 +37,14 @@ namespace session_api.Controllers
         [HttpGet("GetUrlListSession")]
         public IActionResult GetUrlListSession()
         {
-            var dir = _mySessionService.GetUrlListSession();
+            var dir = _urlSessionService.GetUrlListSession();
+            return Ok(dir);
+        }
+
+        [HttpGet("GetSessionsOfUsers")]
+        public IActionResult GetSessionsOfUsers()
+        {
+            var dir = _sessionUserService.GetSessionsOfUsers();
             return Ok(dir);
 
         }
@@ -41,8 +52,8 @@ namespace session_api.Controllers
         //[HttpGet("RemoveUserSession/{connectionId}")]
         //public IActionResult RemoveUserSession(string connectionId)
         //{
-        //    var aSessionUser = _mySessionService.GetUserSessionByConnectionId(connectionId);
-        //    var flag = _mySessionService.RemoveUserSession(aSessionUser);
+        //    var aSessionUser = _userService.GetUserSessionByConnectionId(connectionId);
+        //    var flag = _userService.RemoveUserSession(aSessionUser);
         //    return Ok(flag);
         //}
     }

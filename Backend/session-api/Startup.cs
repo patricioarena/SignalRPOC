@@ -42,7 +42,9 @@ namespace session_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IMySessionService, MySessionService>();
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IUrlSessionService, UrlSessionService>();
+            services.AddSingleton<ISessionUserService, SessionUserService>();
 
 #pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
             var serviceProvider = services.BuildServiceProvider();

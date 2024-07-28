@@ -12,6 +12,7 @@ export class SignalRService {
   private picture: string = "https://i.pinimg.com/originals/35/0e/dd/350edd537688ad50ea3c5615e02ba84e.jpg"
   private actualUrl: string = "http://localhost:4200/"
 
+  private connectionId: string;
   private hubConnection: signalR.HubConnection;
 
   public startConnection = () => {
@@ -23,20 +24,19 @@ export class SignalRService {
       .then(() => isDevMode() && console.log("Connection started"))
       .catch(err => console.error("Error while starting connection: " + err));
 
-
-
     this.hubConnection.on(ExpectedMessage.welcome, (data) => {
       isDevMode() && console.log(`Welcome: ${JSON.stringify(data)}`);
+      this.connectionId = data.connectionId;
 
       const payload = {
         userId: this.userId,
         username: this.username,
-        connectionId: data.connectionId,
+        connectionId: this.connectionId,
         url: this.actualUrl,
         picture: this.picture
       }
 
-      this.sendPayload(payload);
+      this.notifyConnection(payload);
 
     });
 
@@ -52,8 +52,8 @@ export class SignalRService {
     });
   }
 
-  public sendPayload(payload: any) {
-    this.hubConnection.invoke('ReceivePayload', payload)
+  public notifyConnection(payload: any) {
+    this.hubConnection.invoke('NotifyConnection', payload)
       .catch(err => console.error(err));
   }
 

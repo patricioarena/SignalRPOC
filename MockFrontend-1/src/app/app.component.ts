@@ -18,8 +18,4 @@ export class AppComponent implements OnInit {
     this.signalRService.startConnection();
   }
 
-  public sendPayload() {
-    const payload = { message: 'Hello, SignalR!' };
-    this.signalRService.sendPayload(payload);
-  }
 }

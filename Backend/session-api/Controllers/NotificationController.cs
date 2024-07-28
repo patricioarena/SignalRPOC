@@ -14,9 +14,9 @@ namespace session_api.Controllers
     public class NotificationController : ControllerBase
     {
         private IHubContext<SignalHub> _hubContext;
-        public IMySessionService _mySessionService { get; set; }
+        public IUserService _mySessionService { get; set; }
 
-        public NotificationController(IHubContext<SignalHub> hubContext, IMySessionService mySessionService)
+        public NotificationController(IHubContext<SignalHub> hubContext, IUserService mySessionService)
         {
             _hubContext = hubContext;
             _mySessionService = mySessionService;

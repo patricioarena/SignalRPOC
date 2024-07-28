@@ -11,10 +11,15 @@ namespace session_api.Signal
 {
     public class SignalHub : Hub
     {
-        public IMySessionService _mySessionService { get; set; }
-        public SignalHub(IMySessionService mySessionService)
+        public IUserService _userService { get; set; }
+        public IUrlSessionService _urlSessionService { get; set; }
+        public ISessionUserService _sessionUserService { get; set; }
+
+        public SignalHub(IUserService mySessionService, IUrlSessionService urlSessionService, ISessionUserService sessionUserService)
         {
-            _mySessionService = mySessionService;
+            _userService = mySessionService;
+            _urlSessionService = urlSessionService;
+            _sessionUserService = sessionUserService;
         }
 
         public override Task OnConnectedAsync()
@@ -30,7 +35,7 @@ namespace session_api.Signal
                 connectionId = connectionId
             };
 
-            _mySessionService.SetUserSession(userSession: aUserSession);
+            _userService.SetUserSession(userSession: aUserSession);
 
             Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, aUserSession);
             return base.OnConnectedAsync();
@@ -42,22 +47,51 @@ namespace session_api.Signal
             bool exito = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
 
             //TODO: agregar validacion if exito false
-            
+
             UserSession aUserSession = new UserSession
             {
                 userId = userId,
                 connectionId = connectionId
             };
 
-            _mySessionService.RemoveUserSession(userSession: aUserSession);
+            _userService.RemoveUserSession(userSession: aUserSession);
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task ReceivePayload(Payload payload)
+        public async Task NotifyConnection(Payload payload)
         {
-            _mySessionService.UpdateExistingUsertWithPayload(payload);
-            _mySessionService.UpdateExistingUsertWithPayload_TEST(payload);
+            await SynchronizeData(payload);
             await Clients.Client(payload.connectionId).SendAsync("ReceivePayloadResponse", payload);
+        }
+
+        private async Task SynchronizeData(Payload payload)
+        {
+            await _userService.UpdateUserIfEmptyFields(payload)
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(task);
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception); // Propaga el error
+                    await _urlSessionService.AddConnectionToUserSessionIfNotExist(payload);
+                })
+                .Unwrap() // Desenrolla el Task<Task> devuelto por ContinueWith
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(task);
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception); // Propaga el error
+                    await _sessionUserService.AddMapConnectionIdUserId(payload);
+                })
+                .Unwrap() // Desenrolla el Task<Task> devuelto por ContinueWith
+                .ContinueWith(LogTaskError); // Maneja cualquier error final
+        }
+
+        private static void LogTaskError(Task task)
+        {
+            if (task.IsFaulted)
+            {
+                Console.WriteLine($"Se produjo un error: {task.Exception?.GetBaseException().Message}");
+            }
         }
     }
 }
