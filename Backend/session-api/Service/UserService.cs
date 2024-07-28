@@ -33,6 +33,8 @@ namespace session_api.Service
 
         public UserService() { }
 
+        public ConcurrentDictionary<int, User> GetAll() => users;
+
         public void SetCurrentConnection(UserConnection userConnection)
         {
             var existingUser = GetUserByUserId(userConnection.userId);
@@ -45,11 +47,6 @@ namespace session_api.Service
         public User GetUserByUserId(int userId)
         {
             return users.TryGetValue(userId, out User userSession) ? userSession : null;
-        }
-
-        public ConcurrentDictionary<int, User> GetAll()
-        {
-            return users;
         }
 
         public Task RemoveCurrentConnection(UserConnection userConnection)

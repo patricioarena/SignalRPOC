@@ -21,14 +21,11 @@ namespace session_api.Service
 
         public UrlConnectionService() { }
 
+        public ConcurrentDictionary<string, List<string>> GetAll() => urlListConnections;
+
         public List<string> GetListConnectionsByUrl(string url)
         {
             return urlListConnections.TryGetValue(url, out List<string> listConnection) ? listConnection : null;
-        }
-
-        public ConcurrentDictionary<string, List<string>> GetAll()
-        {
-            return urlListConnections;
         }
 
         public Task AddConnectionToListConnectionsIfNotExist(Payload payload)
