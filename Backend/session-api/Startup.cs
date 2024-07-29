@@ -13,18 +13,19 @@ using Microsoft.AspNetCore.Rewrite;
 using session_api.Signal;
 using session_api.Service;
 using session_api.IService;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Linq;
 
 namespace session_api
 {
     public class Startup
     {
-        readonly string AllowAll = "_allowAll";
-        private readonly ILogger _Logger;
+        private readonly string AllowAll = "_allowAll";
+        private readonly ILogger _logger;
 
         private static OpenApiContact contact = new OpenApiContact { Email = "patricio.e.arena@gmail.com", Name = "Patricio Ernesto Antonio Arena" };
         private static OpenApiInfo Info = new OpenApiInfo { Title = "Session Api", Version = "v1", Contact = contact };
 
-        private readonly ILogger _logger;
         public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration, ILogger<Startup> logger, IHostEnvironment env)
         {
@@ -40,22 +41,17 @@ namespace session_api
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "ASP0000:Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'", Justification = "<pendiente>")]
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IMySessionService, MySessionService>();
-
-#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-            var serviceProvider = services.BuildServiceProvider();
-#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-
-            var logger = serviceProvider.GetService<ILogger<Startup>>();
-            services.AddSingleton(typeof(ILogger), logger);
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton(typeof(ILogger), services.BuildServiceProvider().GetService<ILogger<Startup>>());
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddMvc().AddNewtonsoftJson(
-                options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                );
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IUrlConnectionService, UrlConnectionService>();
+            services.AddSingleton<IConnectionUserService, ConnectionUserService>();
+
+            services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
             services.AddSwaggerGen(c =>
@@ -66,7 +62,8 @@ namespace session_api
                 c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddSignalR( options => {
+            services.AddSignalR(options =>
+            {
                 options.EnableDetailedErrors = true;
             });
 

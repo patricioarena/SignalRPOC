@@ -13,29 +13,6 @@ namespace session_api
 {
     public class Program
     {
-        //For production
-        //public static void Main(string[] args)
-        //{
-        //    var config = new ConfigurationBuilder().AddCommandLine(args).Build();
-        //    var host = new WebHostBuilder()
-        //        .UseKestrel()
-        //        .UseContentRoot(Directory.GetCurrentDirectory())
-        //        .UseConfiguration(config)
-        //        .UseIISIntegration()
-        //        .UseStartup<Startup>()
-        //        .Build();
-
-        //    host.Run();
-        //}
-
-        //public static IHostBuilder CreateHostBuilder(string[] args) =>
-        //    Host.CreateDefaultBuilder(args)
-        //        .ConfigureWebHostDefaults(webBuilder =>
-        //        {
-        //            webBuilder.UseStartup<Startup>();
-        //        });
-
-        //For develop
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();

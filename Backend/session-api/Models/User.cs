@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace session_api.Models
 {
     [Serializable]
-    public class UserSession
+    public class User
     {
+        public int userId { get; set; }
         public string? username { get; set; }
-        public string? connectionId { get; set; }
-        public List<string> sessions { get; set; } = new List<string>();
+        public string? picture { get; set; }
+        public List<string> connections { get; set; } = new List<string>();
     }
 }
