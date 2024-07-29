@@ -9,7 +9,7 @@ namespace session_api.IService
     {
         User GetUserByUserId(int userId);
         ConcurrentDictionary<int, User> GetAll();
-        Task RemoveCurrentConnection(UserConnection userConnection);
+        Task RemoveCurrentConnectionFromUser(UserConnection userConnection);
         void SetCurrentConnection(UserConnection userConnection);
         Task UpdateUserIfEmptyFields(Payload payload);
     }

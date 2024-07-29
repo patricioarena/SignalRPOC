@@ -15,20 +15,20 @@ namespace session_api.Service
     {
         private ConcurrentDictionary<int, User> users = new ConcurrentDictionary<int, User>()
         {
-            [3456] = new User
-            {
-                userId = 3456,
-                username = "Erik",
-                picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
-                connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
-            },
-            [6788] = new User 
-            { 
-                userId = 6788, 
-                username = "Charles", 
-                picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
-                connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
-            }
+            //[3456] = new User
+            //{
+            //    userId = 3456,
+            //    username = "Erik",
+            //    picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
+            //    connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
+            //},
+            //[6788] = new User 
+            //{ 
+            //    userId = 6788, 
+            //    username = "Charles", 
+            //    picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
+            //    connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
+            //}
         };
 
         public UserService() { }
@@ -49,7 +49,7 @@ namespace session_api.Service
             return users.TryGetValue(userId, out User userSession) ? userSession : null;
         }
 
-        public Task RemoveCurrentConnection(UserConnection userConnection)
+        public Task RemoveCurrentConnectionFromUser(UserConnection userConnection)
         {
             var existingUser = GetUserByUserId(userConnection.userId);
             if (existingUser != null)
@@ -101,11 +101,14 @@ namespace session_api.Service
         private bool RemoveConnectionFromUser(User user, string connectionId)
         {
             var index = user.userId;
-            user.connections.Remove(connectionId);
+            var isSuccessRemoved = user.connections.Remove(connectionId);
+
+            if (isSuccessRemoved && user.connections.Count > 0)
+                return true;
 
             return user.connections.Count == 0
                 ? users.TryRemove(index, out _)
                 : false;
         }
-   }
+    }
 }

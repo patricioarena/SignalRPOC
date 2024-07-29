@@ -1,10 +1,10 @@
 ﻿namespace session_api;
 
 /// <summary>
-/// Metodos que contiene el cliente.
+/// Mensajes que el cliente puede recibir para ejecutar una operación
 /// </summary>
 public static class ClientMethod
 {
-    public const string Welcome = "Welcome";
-    public const string Show_Notification = "Show_Notification";
+    public const string Welcome = "welcome";
+    public const string Show_Notification = "show_notification";
 }

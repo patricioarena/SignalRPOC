@@ -6,17 +6,22 @@ using session_api.IService;
 using session_api.Models;
 using Microsoft.AspNetCore.SignalR;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using session_api.Service;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Microsoft.Extensions.Logging;
 
 namespace session_api.Signal
 {
     public class SignalHub : Hub
     {
-        public IUserService _userService { get; set; }
-        public IUrlConnectionService _urlConnectionService { get; set; }
-        public IConnectionUserService _connectionUserService { get; set; }
+        private readonly ILogger _logger;
+        private readonly IUserService _userService;
+        private readonly IUrlConnectionService _urlConnectionService;
+        private readonly IConnectionUserService _connectionUserService;
 
-        public SignalHub(IUserService userService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
+        public SignalHub(ILogger<SignalHub> logger, IUserService userService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
         {
+            _logger = logger;
             _userService = userService;
             _urlConnectionService = urlConnectionService;
             _connectionUserService = connectionUserService;
@@ -25,9 +30,9 @@ namespace session_api.Signal
         public override Task OnConnectedAsync()
         {
             var connectionId = Context.ConnectionId;
-            bool exito = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
+            bool successful = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
 
-            //TODO: agregar validacion if exito false
+            //TODO: agregar validacion if successful false
 
             UserConnection aUserConnection = new UserConnection
             {
@@ -41,12 +46,12 @@ namespace session_api.Signal
             return base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
             var connectionId = Context.ConnectionId;
-            bool exito = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
+            bool successful = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
 
-            //TODO: agregar validacion if exito false
+            //TODO: agregar validacion if successful false
 
             UserConnection aUserConnection = new UserConnection
             {
@@ -54,44 +59,87 @@ namespace session_api.Signal
                 connectionId = connectionId
             };
 
-            _userService.RemoveCurrentConnection(userConnection: aUserConnection);
-            return base.OnDisconnectedAsync(exception);
+            await SynchronizeRemoveData(aUserConnection)
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(nameof(SynchronizeRemoveData), task);
+
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    await base.OnDisconnectedAsync(exception);
+                })
+                .Unwrap();
         }
 
         public async Task NotifyConnection(Payload payload)
         {
-            await SynchronizeData(payload);
+            await SynchronizeUpdateData(payload);
             await Clients.Client(payload.connectionId).SendAsync("ReceivePayloadResponse", payload);
         }
+        private async Task SynchronizeRemoveData(UserConnection userConnection)
+        {
+            await _connectionUserService.GetUserUrlByConnectionId(userConnection.connectionId)
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
 
-        private async Task SynchronizeData(Payload payload)
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    await _urlConnectionService.RemoveCurrentConnectionFromUrl(userConnection.connectionId, task.Result.url);
+                })
+                .Unwrap()
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(nameof(_urlConnectionService.RemoveCurrentConnectionFromUrl), task);
+
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    await _connectionUserService.RemoveCurrentConnectionFromConnectionUser(userConnection.connectionId);
+                })
+                .Unwrap()
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(nameof(_connectionUserService.RemoveCurrentConnectionFromConnectionUser), task);
+
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    await _userService.RemoveCurrentConnectionFromUser(userConnection: userConnection);
+                })
+                .Unwrap()
+                .ContinueWith(task => LogTaskError(nameof(_userService.RemoveCurrentConnectionFromUser), task)); 
+        }
+
+        private async Task SynchronizeUpdateData(Payload payload)
         {
             await _userService.UpdateUserIfEmptyFields(payload)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(task);
+                    LogTaskError(nameof(_userService.UpdateUserIfEmptyFields), task);
+
                     if (task.IsFaulted)
-                        await Task.FromException(task.Exception); // Propaga el error
+                        await Task.FromException(task.Exception);
                     await _urlConnectionService.AddConnectionToListConnectionsIfNotExist(payload);
                 })
-                .Unwrap() // Desenrolla el Task<Task> devuelto por ContinueWith
+                .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(task);
+                    LogTaskError(nameof(_urlConnectionService.AddConnectionToListConnectionsIfNotExist), task);
+
                     if (task.IsFaulted)
-                        await Task.FromException(task.Exception); // Propaga el error
+                        await Task.FromException(task.Exception);
                     await _connectionUserService.AddMapConnectionIdUserId(payload);
                 })
-                .Unwrap() // Desenrolla el Task<Task> devuelto por ContinueWith
-                .ContinueWith(LogTaskError); // Maneja cualquier error final
+                .Unwrap()
+                .ContinueWith(task => LogTaskError(nameof(_connectionUserService.AddMapConnectionIdUserId), task));
         }
 
-        private static void LogTaskError(Task task)
+        private void LogTaskError(string methodName, Task task)
         {
             if (task.IsFaulted)
-            {
-                Console.WriteLine($"Se produjo un error: {task.Exception?.GetBaseException().Message}");
-            }
+                _logger.LogError(methodName, task.Exception?.GetBaseException().Message);
         }
+
+        ///TODO:
+        ///Crear un heartbeat que verifique que los clientes estan conectados periodicamente
     }
 }

@@ -20,13 +20,12 @@ namespace session_api
 {
     public class Startup
     {
-        readonly string AllowAll = "_allowAll";
-        private readonly ILogger _Logger;
+        private readonly string AllowAll = "_allowAll";
+        private readonly ILogger _logger;
 
         private static OpenApiContact contact = new OpenApiContact { Email = "patricio.e.arena@gmail.com", Name = "Patricio Ernesto Antonio Arena" };
         private static OpenApiInfo Info = new OpenApiInfo { Title = "Session Api", Version = "v1", Contact = contact };
 
-        private readonly ILogger _logger;
         public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration, ILogger<Startup> logger, IHostEnvironment env)
         {
@@ -61,7 +60,6 @@ namespace session_api
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
-                c.DocumentFilter<LowercaseDocumentFilter>();
             });
 
             services.AddSignalR(options =>

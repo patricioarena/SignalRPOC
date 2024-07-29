@@ -15,42 +15,61 @@ namespace session_api.Service
     {
         private ConcurrentDictionary<string, UserUrl> connectionUser = new ConcurrentDictionary<string, UserUrl>()
         {
-            ["-eswoeZl3ao8hLANGQwZEQ"] = new UserUrl { userId = 3456, url = "http://localhost:4200/" },
-            ["H_KEV01cQrFzJdBN-Fx6lA"] = new UserUrl { userId = 6788, url = "http://localhost:4200/" },
-            ["-eswoeZl3ao8hLANGQwZdQ"] = new UserUrl { userId = 3456, url = "http://localhost:4201/" },
-            ["H_KEV01cQrFzJdBN-Fx4lA"] = new UserUrl { userId = 6788, url = "http://localhost:4201/" }
+            //["-eswoeZl3ao8hLANGQwZEQ"] = new UserUrl { userId = 3456, url = "http://localhost:4200/" },
+            //["H_KEV01cQrFzJdBN-Fx6lA"] = new UserUrl { userId = 6788, url = "http://localhost:4200/" },
+            //["-eswoeZl3ao8hLANGQwZdQ"] = new UserUrl { userId = 3456, url = "http://localhost:4201/" },
+            //["H_KEV01cQrFzJdBN-Fx4lA"] = new UserUrl { userId = 6788, url = "http://localhost:4201/" }
         };
 
         public ConnectionUserService() { }
 
         public ConcurrentDictionary<string, UserUrl> GetAll() => connectionUser;
 
-        public UserUrl GetUserIdByConnectionId(string connectionId)
+        public Task<UserUrl> GetUserUrlByConnectionId(string connectionId)
         {
-            return connectionUser.TryGetValue(connectionId, out UserUrl userUrl) ? userUrl : null;
+            return connectionUser.TryGetValue(connectionId, out UserUrl userUrl)
+                ? Task.FromResult(userUrl)
+                : Task.FromException<UserUrl>(new UserNotFoundException());
         }
 
-        public Task AddMapConnectionIdUserId(Payload payload)
+        public async Task AddMapConnectionIdUserId(Payload payload)
         {
-            try
-            {
-                var existingConnectionUser = GetUserIdByConnectionId(payload.connectionId);
-                if (existingConnectionUser == null)
+
+            await GetUserUrlByConnectionId(payload.connectionId)
+                .ContinueWith(async task =>
                 {
-                    connectionUser[payload.connectionId] = new UserUrl { userId = payload.userId, url = payload.url };
-                    return Task.CompletedTask; // Representa éxito sin valor de retorno
-                }
-                return Task.FromException(new NotAddedMapping());
-            }
-            catch (Exception ex)
-            {
-                return Task.FromException(ex); // Representa error en caso de excepción
-            }
+                    if (task.IsFaulted)
+                    {
+                        connectionUser.TryAdd(payload.connectionId, new UserUrl { userId = payload.userId, url = payload.url });
+                        return Task.CompletedTask;
+                    }
+                    ///TODO:
+                    ///Crear un heartbeat que verifique que los clientes estan conectados periodicamente
+                    ///
+                    return Task.FromException(new InvalidOperationException());
+                });
+        }
+
+        public Task RemoveCurrentConnectionFromConnectionUser(string connectionId)
+        {
+            return RemoveConnectionFromConnectionUser(connectionId)
+                ? Task.CompletedTask
+                : Task.FromException(new InvalidOperationException());
+        }
+
+        public bool RemoveConnectionFromConnectionUser(string connectionId)
+        {
+            return connectionUser.ContainsKey(connectionId)
+              ? connectionUser.TryRemove(connectionId, out _)
+              : false;
         }
 
         /// TODO
         /// Falta la parte de remover el connectionId de la pagina 
-        /// para eso usando el connectionId buscamos en ConnectionUserService que url se le corresponde 
-        /// y extraemos la url, con esa vamos al UrlConnectionService y usando la url actualizamos la lista de sessiones. 
+        /// para eso:
+        ///    usando el connectionId buscamos en ConnectionUserService que url se le corresponde [x]
+        ///    ir UrlConnectionService y usar la url para actualizar la lista de sessiones. 
+        ///  
+
     }
 }

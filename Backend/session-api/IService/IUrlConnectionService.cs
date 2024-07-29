@@ -10,4 +10,5 @@ public interface IUrlConnectionService
     List<string> GetListConnectionsByUrl(string url);
     ConcurrentDictionary<string, List<string>> GetAll();
     Task AddConnectionToListConnectionsIfNotExist(Payload payload);
+    Task RemoveCurrentConnectionFromUrl(string connectionId, string url);
 }

@@ -1,5 +1,6 @@
 import { Injectable, isDevMode } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
+import { BehaviorSubject } from 'rxjs';
 import { ExpectedMessage } from './expected.messages';
 
 
@@ -7,6 +8,9 @@ import { ExpectedMessage } from './expected.messages';
   providedIn: 'root'
 })
 export class SignalRService {
+  public connectionId$ = new BehaviorSubject(null)
+
+
   private userId: number = 12345;
   private username: string = "alice";
   private picture: string = "https://i.pinimg.com/originals/35/0e/dd/350edd537688ad50ea3c5615e02ba84e.jpg"
@@ -27,6 +31,7 @@ export class SignalRService {
     this.hubConnection.on(ExpectedMessage.welcome, (data) => {
       isDevMode() && console.log(`Welcome: ${JSON.stringify(data)}`);
       this.connectionId = data.connectionId;
+      this.connectionId$.next(this.connectionId);
 
       const payload = {
         userId: this.userId,

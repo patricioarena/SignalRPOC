@@ -10,12 +10,16 @@ import { SignalRService } from './signal-r.service';
 export class AppComponent implements OnInit {
 
   title = 'SignalRPOC';
-  connectionName = "alice";
+  username = "Alice";
+  connectionId = "";
 
   constructor(private signalRService: SignalRService) { }
 
   public ngOnInit() {
     this.signalRService.startConnection();
+    this.signalRService.connectionId$.subscribe((id: string) => {
+        this.connectionId = id;
+    })
   }
 
 }

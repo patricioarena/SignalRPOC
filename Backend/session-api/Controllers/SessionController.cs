@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace session_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/session")]
     [EnableCors("AllowAll")]
     [ApiExplorerSettings(IgnoreApi = false)]
     public class SessionController : ControllerBase
@@ -26,7 +26,7 @@ namespace session_api.Controllers
             _connectionUserService = connectionUserService;
         }
 
-        [HttpGet("Get/All/Users")]
+        [HttpGet("get/all/users")]
         public IActionResult GetUsers()
         {
             var dir = _userService.GetAll();
@@ -34,14 +34,14 @@ namespace session_api.Controllers
 
         }
 
-        [HttpGet("Get/All/Url/And/List/Connections")]
+        [HttpGet("get/all/url/and/list/connections")]
         public IActionResult GetUrlListConnections()
         {
             var dir = _urlConnectionService.GetAll();
             return Ok(dir);
         }
 
-        [HttpGet("Get/All/Connection/User")]
+        [HttpGet("get/all/connection/user")]
         public IActionResult GetConnectionUser()
         {
             var dir = _connectionUserService.GetAll();
@@ -49,7 +49,7 @@ namespace session_api.Controllers
 
         }
 
-        [HttpGet("Remove/Connection/{connectionId}/of/User/{userId}")]
+        [HttpGet("remove/connection/{connectionId}/of/user/{userId}")]
         public IActionResult RemoveCurrentConnection(string connectionId)
         {
             return Ok(connectionId);

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace session_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/values")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ValuesController : ControllerBase
     {

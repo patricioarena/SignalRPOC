@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace session_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/notification")]
     [EnableCors("AllowAll")]
     [ApiExplorerSettings(IgnoreApi = false)]
     public class NotificationController : ControllerBase
@@ -29,7 +29,7 @@ namespace session_api.Controllers
             return Ok();
         }
 
-        [HttpGet("send/message/to/connectionId/{connectionId}")]
+        [HttpGet("send/message/to/connection/{connectionId}")]
         public IActionResult Get(string connectionId)
         {
             _hubContext.Clients.Client(connectionId).SendAsync(ClientMethod.Show_Notification, $"Send message to client { connectionId }");
