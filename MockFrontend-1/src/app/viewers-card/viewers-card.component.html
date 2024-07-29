@@ -19,31 +19,31 @@
     </ng-container>
 
     <!-- Icono de "más" -->
-    <div class="viewers-container__more" *ngIf="showMoreIcon" (click)="toggleUsers()">
-      +
+    <div class="viewers-container-more" *ngIf="showMoreIcon" (click)="toggleUsers()">
+      <button class="detail-more-button"><i class="fa-solid fa-circle-plus"></i></button>
     </div>
 
 
-  <ng-template #viewerCardTemplate let-usuario>
-    <div class="viewer-card-tooltip">
-      <div class="viewer-card-content">
-        <div class="viewer-card-image">
-          <img class="viewer-card-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
-          <span class="viewer-card-status"></span>
+    <ng-template #viewerCardTemplate let-usuario>
+      <div class="viewer-card-tooltip">
+        <div class="viewer-card-content">
+          <div class="viewer-card-image">
+            <img class="viewer-card-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+            <span class="viewer-card-status"></span>
+          </div>
+          <div class="viewer-card-body">
+            <h2 class="viewer-card-nameuser">{{ usuario.nombreUsuario }}</h2>
+            <h3 class="viewer-card-email">{{ usuario.email }}</h3>
+            <h3 class="viewer-card-positionjob"><i class="far fa-building"></i> {{ usuario.cargo }}</h3>
+          </div>
         </div>
-        <div class="viewer-card-body">
-          <h2 class="viewer-card-nameuser">{{ usuario.nombreUsuario }}</h2>
-          <h3 class="viewer-card-email">{{ usuario.email }}</h3>
-          <h3 class="viewer-card-positionjob"><i class="far fa-building"></i> {{ usuario.cargo }}</h3>
+        <div class="viewer-card-footer">
+          <button class="detail-viewer-button"><i class="fa-regular fa-envelope"></i></button>
+          <button class="detail-viewer-button"><i class="fa-regular fa-calendar"></i></button>
+          <button class="detail-viewer-button"><i class="fa-regular fa-comment"></i></button>
         </div>
       </div>
-      <div class="viewer-card-footer">
-        <button class="detail-viewer-button"><i class="fa-regular fa-envelope"></i></button>
-        <button class="detail-viewer-button"><i class="fa-regular fa-calendar"></i></button>
-        <button class="detail-viewer-button"><i class="fa-regular fa-comment"></i></button>
-      </div>
-    </div>
-  </ng-template>
-</div>
+    </ng-template>
+  </div>
 </body>
 </html>

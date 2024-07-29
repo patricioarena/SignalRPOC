@@ -3,7 +3,6 @@
 .viewers-container {
   position: relative;
   display: grid;
-  // gap: 10px;
   padding: 10px;
   background-color: var(--container-color);
   grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
@@ -11,19 +10,43 @@
   // overflow: hidden;
 }
 
-.viewers-container__more {
+.viewers-container-more {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px; /* Tamaño del icono */
-  height: 30px; /* Tamaño del icono */
-  background-color: var(--icon-background-color, #f0f0f0); /* Color de fondo del icono */
-  border-radius: 50%;
   position: absolute;
   right: 0;
   bottom: 0;
-  cursor: pointer;
   z-index: 1;
+
+  .detail-more-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 6px;
+    transition: color 0.3s ease, transform 0.3s ease;
+
+    i {
+      font-size: 15px;
+      fill: #007bff;
+    }
+
+    &:hover {
+      color: #007bff;
+      transform: scale(1.1);
+    }
+
+    &:focus {
+      outline: none;
+      color: #0056b3;
+    }
+
+    &:active {
+      color: #004494;
+      transform: scale(1);
+    }
+  }
 }
 
 .viewer-thumbnail-wrapper {
@@ -40,8 +63,8 @@
   }
 
   .viewer-thumbnail-image .viewer-thumbnail-img {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid var(--thumbnail-image-border-color);
@@ -57,15 +80,15 @@
 
 .viewer-card-tooltip-container {
   position: absolute;
-  min-width: 200px;
-  max-width: 300px;
-  bottom: calc(100% + 4px); /* Ajusta la posición vertical con un margen */
-  left: 50%; /* Centro horizontal */
+  // min-width: 200px;
+  // max-width: 300px;
+  //bottom: calc(100% + 4px); /* Ajusta la posición vertical con un margen */
+  //left: 50%; /* Centro horizontal */
   // transform: translateX(-50%); /* Centrar el tooltip horizontalmente */
-  padding-bottom: 1rem;
+  // padding-bottom: 1rem;
   //transition: opacity .4s, bottom .4s cubic-bezier(.6, -.5, .3, 1.5);
   pointer-events: none;
-  // opacity: 0;
+  //opacity: 0;
   padding: 10px;
 
   .viewer-card-tooltip {
@@ -192,7 +215,7 @@
 }
 
 .viewer-thumbnail-wrapper .viewer-card-tooltip-container {
-  transform: translateX(-20%) translateY(220px);
+  //transform: translateX(-20%) translateY(220px);
   // transform: translateX(-50%) translateY(calc(100% + 10px));
   // /* Ajuste con `calc` para una mejor control de la posición vertical */
 }
@@ -201,7 +224,7 @@
 .viewer-card-tooltip-container:hover {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-20%) translateY(220px);
+  // transform: translateX(-20%) translateY(220px);
   // opacity: 1;
   // pointer-events: auto;
   // transform: translateX(-50%) translateY(calc(100% + 10px));
