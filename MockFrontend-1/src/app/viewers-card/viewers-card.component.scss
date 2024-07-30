@@ -51,6 +51,8 @@
 .dropdown-menu {
   position: absolute;
   background-color: var(--body-color);
+  border: 0.5px solid var(--gray-color);
+  border-radius: 5px;
   //box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   right: 0;
@@ -60,7 +62,7 @@
   .dropdown-item {
     padding: 5px;
     cursor: pointer;
-    border-radius: 5px;
+    // border-radius: 5px;
     border-bottom: 1px solid var(--border-color);
     //box-shadow: 0 6px 6px var(--card-tooltip-color-shadow);
     //transition: box-shadow 0.3s ease;
@@ -173,7 +175,8 @@
   }
 
   .dropdown-item:hover {
-    background: hsl(200, 30%, 95%)
+    background: hsl(200, 30%, 95%);
+    border-radius: 5px;
   }
 }
 
@@ -219,6 +222,7 @@
     background-color: var(--body-color);
     box-shadow: 0 8px 16px var(--card-tooltip-color-shadow);
     border-radius: 5px;
+    border: 1px solid var(--gray-color);
     width: 100%;
     transition: box-shadow 0.3s ease;
 
