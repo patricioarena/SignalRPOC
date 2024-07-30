@@ -9,7 +9,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
   private readonly MIN_CARD_WIDTH = '200px';
   private readonly MAX_CARD_WIDTH = '250px';
   private readonly MAX_CONTENT_WIDTH = '150px';
-  private readonly FONT_SIZE = '14px';
+  private readonly FONT_SIZE = '15px';
 
   constructor(private element: ElementRef, private renderer: Renderer2) { }
 
@@ -21,56 +21,14 @@ export class TooltipAdjustDirective implements AfterViewInit{
     }
   }
 
-  // @HostListener('window:resize')
-  // onWindowResize(){
-  //   console.log("ONWINDOWRESIZE")
-  //   this.adjustTooltipPosition();
-  //   this.adjustCardDimensions();
-  // }
-  // @HostListener('mouseenter') onMouseEnter() {
-  //   this.adjustTooltipPosition();
-  // }
-
-  // @HostListener('mouseleave') onMouseLeave() {
-  //   this.adjustTooltipPosition();
-  // }
-
   adjustTooltipPosition() {
-    // const element = this.element.nativeElement;
-    // const rect = element.getBoundingClientRect();
-    // const viewportWidth = window.innerWidth;
-
-    // // Obtener el ancho y alto del elemento
-    // const elementWidth = element.offsetWidth;
-    // const elementHeight = element.offsetHeight;
-
-    // // Obtener el contenedor padre para calcular la posición relativa
-    // const parentElement = element.parentElement;
-    // const parentRect = parentElement ? parentElement.getBoundingClientRect() : { left: 0, top: 0 };
-
-    // // Calcular la posición del tooltip en relación con el contenedor padre
-    // const offsetLeft = rect.left - parentRect.left;
-
-    // // Ajustar la posición si la tarjeta se sale del margen derecho
-    // if (rect.right > viewportWidth) {
-    //   const overflowRight = rect.right - viewportWidth;
-    //   const newLeft = Math.max(-200, offsetLeft - overflowRight);
-    //   this.setElementStyle('left', `${newLeft}px`);
-    // }
-
-    // // Ajustar la posición si la tarjeta se sale del margen izquierdo
-    // if (rect.left < 0) {
-    //   const overflowLeft = Math.abs(rect.left);
-    //   const newLeft = Math.max(20, offsetLeft + overflowLeft);
-    //   this.setElementStyle('left', `${newLeft}px`);
-    // }
     const element = this.element.nativeElement;
     const rect = element.getBoundingClientRect();
 
     // Obtener el contenedor .viewers-container y su rectángulo delimitador
     const viewersContainer = document.querySelector('.viewer-thumbnail-wrapper');
     if (!viewersContainer) {
-      console.error('Contenedor .viewers-container no encontrado');
+      console.error('Contenedor no encontrado');
       return;
     }
     const containerRect = viewersContainer.getBoundingClientRect();
@@ -84,15 +42,17 @@ export class TooltipAdjustDirective implements AfterViewInit{
 
     // Ajustar la posición si la tarjeta se sale del margen derecho del contenedor
     if (rect.right > containerRect.right) {
+      console.log("margen derecho")
       const overflowRight = rect.right - containerRect.right;
-      offsetLeft = Math.max(-120, offsetLeft - overflowRight);
+      offsetLeft = Math.max(-145, offsetLeft - overflowRight);
       this.setElementStyle('left', `${offsetLeft}px`);
     }
 
     // Ajustar la posición si la tarjeta se sale del margen izquierdo del contenedor
     if (rect.left < containerRect.left) {
+      console.log("margen izquierdo")
       const overflowLeft = containerRect.left - rect.left;
-      offsetLeft = Math.max(-80, offsetLeft + overflowLeft);
+      offsetLeft = Math.max(-100, offsetLeft + overflowLeft);
       this.setElementStyle('left', `${offsetLeft}px`);
     }
 
@@ -102,6 +62,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
   }
 
   private adjustCardDimensions(): void {
+    console.log("ajusto dimension card")
     this.setElementStyle('max-width', this.MAX_CARD_WIDTH);
     this.setElementStyle('min-width', this.MIN_CARD_WIDTH);
 

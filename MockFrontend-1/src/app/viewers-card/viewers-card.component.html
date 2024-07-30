@@ -19,10 +19,38 @@
     </ng-container>
 
     <!-- Icono de "más" -->
-    <div class="viewers-container-more" *ngIf="showMoreIcon" (click)="toggleUsers()">
+    <!-- <div class="viewers-container-more" *ngIf="showMoreIcon" (click)="toggleUsers()">
       <button class="detail-more-button"><i class="fa-solid fa-circle-plus"></i></button>
-    </div>
+    </div> -->
 
+    <!-- Dropdown de usuarios -->
+    <!-- <div *ngIf="isDropdownOpen" class="dropdown-menu">
+      <ng-container *ngFor="let usuario of usuarios">
+        <div class="dropdown-item">{{ usuario.nombreUsuario }}</div>
+      </ng-container>
+    </div> -->
+
+     <!-- Contenedor relativo para el botón y la lista desplegable -->
+    <div class="viewers-container-more" *ngIf="showMoreIcon">
+      <button class="detail-more-button" (click)="toggleUsers()">
+        <i [ngClass]="isDropdownOpen ? 'fas fa-chevron-circle-up' : 'fa-solid fa-circle-plus'"></i>
+      </button>
+
+      <!-- Dropdown de usuarios restantes -->
+      <div *ngIf="isDropdownOpen" class="dropdown-menu">
+        <ng-container *ngFor="let usuario of remainingUsers">
+          <div class="dropdown-item">
+            <div class="viewer-item-image">
+              <img class="viewer-item-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+            </div>
+            <div class="dropdown-item-body">
+              <h2 class="viewer-item-nameuser">{{ usuario.nombreUsuario }}</h2>
+              <h3 class="viewer-item-email">{{ usuario.email }}</h3>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
 
     <ng-template #viewerCardTemplate let-usuario>
       <div class="viewer-card-tooltip">

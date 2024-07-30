@@ -19,8 +19,9 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
   private showTimeout: any;
   private readonly hideDelay = 700;
   private readonly showDelay = 300;
-  private visibleUserCount = 4; // Número máximo de usuarios visibles inicialmente
-  private showAll = false; // Flag para mostrar todos los usuarios
+  private visibleUserCount = 10; // Número máximo de usuarios visibles inicialmente
+//  private showAll = false; // Flag para mostrar todos los usuarios
+  isDropdownOpen = false; //Controla la visibilidad del dropdown
 
   // private styleAdjuster: StyleAdjusterService
   constructor() {}
@@ -67,8 +68,15 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
 
   // Método para alternar la visibilidad de los usuarios
   toggleUsers() {
-    this.showAll = !this.showAll;
-    this.visibleUserCount = this.showAll ? this.usuarios.length : 4;
+    // this.showAll = !this.showAll;
+    // this.visibleUserCount = this.showAll ? this.usuarios.length : 10;
+    this.isDropdownOpen = !this.isDropdownOpen; //Alterna el estado del dropdown
+    console.log(this.isDropdownOpen)
+  }
+
+  // Obtener usuarios restantes
+  get remainingUsers() {
+    return this.usuarios.slice(this.visibleUserCount);
   }
 
   // Obtener usuarios visibles en función del estado
@@ -78,6 +86,7 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
 
   // Determinar si se debe mostrar el icono de "más"
   get showMoreIcon() {
-    return !this.showAll && this.usuarios.length > 4;
+    // return !this.showAll && this.usuarios.length > 10;
+    return this.usuarios.length > this.visibleUserCount;
   }
 }

@@ -13,10 +13,15 @@ $body-color: hsl(230, 100%, 98%);
 $container-color: hsl(0, 0%, 100%);
 $thumbnail-image-border-color: hsl(120, 66%, 30%);
 $thumbnail-image-border-color-shadow: hsla(145, 96%, 18%, 0.274);
+$card-tooltip-color-shadow: hsla(0, 0.62%, 31.96%, 0.3);
+$card-status-color: hsl(120, 100%, 99%);
+$button-color: hsl(211, 100%, 50%);
+$button-color-focus: hsl(211, 100%, 35%);
+$button-color-active: hsl(212, 100%, 29%);
 $change: 15%;
 
 $body-font: 'Syne', sans-serif;
-$h2-font-size: 1.25rem;
+$h2-font-size: 1.05rem;
 $h3-font-size: 1rem;
 $normal-font-size: 1rem;
 
@@ -33,6 +38,11 @@ $normal-font-size: 1rem;
   --container-color: #{$container-color};
   --thumbnail-image-border-color: #{$thumbnail-image-border-color};
   --thumbnail-image-border-color-shadow: #{$thumbnail-image-border-color-shadow};
+  --card-tooltip-color-shadow: #{$card-tooltip-color-shadow};
+  --card-status-color: #{$card-status-color};
+  --button-color: #{$button-color};
+  --button-color-focus: #{$button-color-focus};
+  --button-color-active: #{$button-color-active};
 
   --body-font: '#{$body-font}';
   --h2-font-size: #{$h2-font-size};
