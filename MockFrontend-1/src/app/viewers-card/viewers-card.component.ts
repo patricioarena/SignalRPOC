@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { Usuario } from '../Usuario';
 // import { StyleAdjusterService } from '../services/style-adjuster.service';
 
@@ -9,9 +9,7 @@ import { Usuario } from '../Usuario';
 })
 export class ViewersCardComponent implements OnInit, AfterViewInit{
   @ViewChild('viewerCardContainer', { static: false }) viewerCardContainer: ElementRef;
-
-  ngOnInit(): void {
-  }
+  @ViewChild('dropdownMenu', { static: false }) dropdownMenu: ElementRef; // Elemento del dropdown
 
   @Input() usuarios : Usuario[];
   hoveredViewer: Usuario | null = null;
@@ -24,7 +22,10 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
   isDropdownOpen = false; //Controla la visibilidad del dropdown
 
   // private styleAdjuster: StyleAdjusterService
-  constructor() {}
+  constructor(private eRef: ElementRef) {}
+
+  ngOnInit(): void {
+  }
 
   ngAfterViewInit(){
     if(this.viewerCardContainer){
@@ -66,7 +67,7 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
     }
   }
 
-  // Método para alternar la visibilidad de los usuarios
+  // Metodo para alternar la visibilidad de los usuarios
   toggleUsers() {
     // this.showAll = !this.showAll;
     // this.visibleUserCount = this.showAll ? this.usuarios.length : 10;
@@ -79,14 +80,22 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
     return this.usuarios.slice(this.visibleUserCount);
   }
 
-  // Obtener usuarios visibles en función del estado
+  // Obtener usuarios visibles en funcion del estado
   get visibleUsers() {
     return this.usuarios.slice(0, this.visibleUserCount);
   }
 
-  // Determinar si se debe mostrar el icono de "más"
+  // Determinar si se debe mostrar el icono de mas
   get showMoreIcon() {
     // return !this.showAll && this.usuarios.length > 10;
     return this.usuarios.length > this.visibleUserCount;
+  }
+
+  // Detectar clic fuera del dropdown para cerrarlo
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (this.isDropdownOpen && this.dropdownMenu && !this.eRef.nativeElement.contains(event.target)) {
+      this.isDropdownOpen = false;
+    }
   }
 }

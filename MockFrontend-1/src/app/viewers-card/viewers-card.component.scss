@@ -51,7 +51,7 @@
 .dropdown-menu {
   position: absolute;
   background-color: var(--body-color);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  //box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   right: 0;
   bottom: 0;
@@ -60,59 +60,120 @@
   .dropdown-item {
     padding: 5px;
     cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    box-shadow: 0 8px 16px var(--card-tooltip-color-shadow);
-    transition: box-shadow 0.3s ease;
+    border-radius: 5px;
+    border-bottom: 1px solid var(--border-color);
+    //box-shadow: 0 6px 6px var(--card-tooltip-color-shadow);
+    //transition: box-shadow 0.3s ease;
+
+    .dropdown-item-content{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 0.5rem;
+
+      .viewer-item-image {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+
+        img.viewer-item-img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+        }
+
+        .viewer-card-status {
+          width: 7px;
+          height: 7px;
+          background-color: var(--second-color);
+          position: absolute;
+          top: 5px;
+          right: 4px;
+          border-radius: 50%;
+          border: 1px solid var(--card-status-color);
+        }
+
+      }
+
+      .dropdown-item-body {
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        align-content: center;
+        flex-grow: 1;
+
+        h2.viewer-item-nameuser {
+          margin: 2px 0;
+          font-family: var(--body-font);
+          font-size: var(--h2-font-size);
+          color: var(--title-color);
+          font-weight: 300;
+        }
+
+        h3.viewer-item-email,
+        h3.viewer-item-positionjob {
+          margin: 2px 0;
+          font-family: var(--body-font);
+          font-size: var(--h3-font-size);
+          color: var(--text-color);
+          font-weight: 300;
+        }
+      }
+    }
 
     &:hover {
       opacity: 1;
       pointer-events: auto;
-      box-shadow: 0 0 4px 4px var(--card-tooltip-color-shadow);
+      //box-shadow: 0 0 4px 4px var(--card-tooltip-color-shadow);
     }
 
-    .viewer-item-image {
-      position: relative;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-
-      img.viewer-item-img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-      }
-    }
-
-    .dropdown-item-body {
-      padding: 5px;
+    .dropdown-item-footer {
       display: flex;
-      flex-direction: column;
-      text-align: left;
-      align-content: center;
-      flex-grow: 1;
+      justify-content: flex-start;
+      margin-top: auto;
 
-      h2.viewer-item-nameuser {
-        margin: 2px 0;
-        font-family: var(--body-font);
-        font-size: var(--h2-font-size);
-        color: var(--title-color);
-        font-weight: 300;
-      }
+      .detail-viewer-button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin-right: 4px;
+        margin-left: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease, transform 0.3s ease;
 
-      h3.viewer-item-email {
-        margin: 2px 0;
-        font-family: var(--body-font);
-        font-size: var(--h3-font-size);
-        color: var(--text-color);
-        font-weight: 300;
+        i {
+          width: 24px;
+          height: 24px;
+          fill: var(--button-color);
+        }
+
+        &:hover {
+          color: var(--button-color);
+          transform: scale(1.1);
+        }
+
+        &:focus {
+          outline: none;
+          color: var(--button-color-focus);
+        }
+
+        &:active {
+          color: var(--button-color-active);
+          transform: scale(1);
+        }
       }
     }
   }
 
   .dropdown-item:hover {
-    background: var(--body-color);
+    background: hsl(200, 30%, 95%)
   }
 }
 
@@ -149,15 +210,15 @@
   position: absolute;
   pointer-events: none;
   //opacity: 0;
-  padding: 10px;
+  padding: 5px;
 
   .viewer-card-tooltip {
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 5px;
     background-color: var(--body-color);
     box-shadow: 0 8px 16px var(--card-tooltip-color-shadow);
-    border-radius: 8px;
+    border-radius: 5px;
     width: 100%;
     transition: box-shadow 0.3s ease;
 
@@ -173,7 +234,7 @@
       justify-content: flex-start;
       width: 100%;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.5rem;
+      // padding-bottom: 0.5rem;
       margin-bottom: 0.5rem;
 
       .viewer-card-image {
@@ -205,13 +266,11 @@
       .viewer-card-body {
         display: flex;
         flex-direction: column;
-        margin-left: 10px;
+        // margin-left: 10px;
+        padding: 5px;
         text-align: left;
         align-content: center;
         flex-grow: 1;
-        font-family: var(--body-font);
-        font-size: var(--normal-font-size);
-        color: var(--text-color);
 
         h2.viewer-card-nameuser {
           margin: 0;
@@ -219,7 +278,7 @@
           font-size: var(--h2-font-size);
           color: var(--title-color);
           font-weight: 300;
-          margin-bottom: 0.25rem;
+          // margin-bottom: 0.25rem;
         }
 
         h3.viewer-card-email,
@@ -243,7 +302,8 @@
         border: none;
         cursor: pointer;
         padding: 0;
-        margin: 4px;
+        margin-right: 4px;
+        margin-left: 4px;
         display: inline-flex;
         align-items: center;
         justify-content: center;

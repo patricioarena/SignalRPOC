@@ -9,7 +9,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
   private readonly MIN_CARD_WIDTH = '200px';
   private readonly MAX_CARD_WIDTH = '250px';
   private readonly MAX_CONTENT_WIDTH = '150px';
-  private readonly FONT_SIZE = '15px';
+ // private readonly FONT_SIZE = '15px';
 
   constructor(private element: ElementRef, private renderer: Renderer2) { }
 
@@ -37,10 +37,10 @@ export class TooltipAdjustDirective implements AfterViewInit{
     const parentElement = element.parentElement;
     const parentRect = parentElement.getBoundingClientRect();
 
-    // Calcular la posición izquierda del tooltip en relación con el contenedor
+    // Calcular la posicion izquierda del tooltip en relacion con el contenedor
     let offsetLeft = parentRect.left - containerRect.left;
 
-    // Ajustar la posición si la tarjeta se sale del margen derecho del contenedor
+    // Ajustar la posicion si la tarjeta se sale del margen derecho del contenedor
     if (rect.right > containerRect.right) {
       console.log("margen derecho")
       const overflowRight = rect.right - containerRect.right;
@@ -48,7 +48,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
       this.setElementStyle('left', `${offsetLeft}px`);
     }
 
-    // Ajustar la posición si la tarjeta se sale del margen izquierdo del contenedor
+    // Ajustar la posicion si la tarjeta se sale del margen izquierdo del contenedor
     if (rect.left < containerRect.left) {
       console.log("margen izquierdo")
       const overflowLeft = containerRect.left - rect.left;
@@ -56,7 +56,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
       this.setElementStyle('left', `${offsetLeft}px`);
     }
 
-    // Aplicar los estilos de posición al tooltip
+    // Aplicar los estilos de posicion al tooltip
     this.setElementStyle('left', `${offsetLeft}px`);
 
   }
@@ -73,7 +73,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
       const textElements = cardBody.querySelectorAll('*');
       textElements.forEach((textElement: HTMLElement) => {
         this.setElementStyle('max-width', this.MAX_CONTENT_WIDTH, textElement);
-        this.setElementStyle('font-size', this.FONT_SIZE, textElement);
+       // this.setElementStyle('font-size', this.FONT_SIZE, textElement);
       });
     }
   }

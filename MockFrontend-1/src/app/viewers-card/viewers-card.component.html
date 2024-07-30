@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> -->
 </head>
 <body>
   <div class="viewers-container" #viewersContainer>
     <ng-container *ngFor="let usuario of visibleUsers">
-      <div class="viewer-thumbnail-wrapper" (mouseenter)="onMouseEnter(usuario)" (mouseleave)="onMouseLeave()">
+      <div class="viewer-thumbnail-wrapper" (mouseenter)="!isDropdownOpen && onMouseEnter(usuario)" (mouseleave)="!isDropdownOpen && onMouseLeave()">
         <div class="viewer-thumbnail-image">
           <img class="viewer-thumbnail-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
-          <ng-container *ngIf="hoveredViewer === usuario">
+          <ng-container *ngIf="hoveredViewer === usuario  && !isDropdownOpen">
             <div class="viewer-card-tooltip-container" appTooltipAdjust [appTooltipAdjust]="true" #viewerCardContainer (mouseenter)="onMouseEnter(usuario, true)" (mouseleave)="onMouseLeave()">
               <ng-container *ngTemplateOutlet="viewerCardTemplate; context: { $implicit: usuario }"></ng-container>
             </div>
@@ -18,18 +17,6 @@
       </div>
     </ng-container>
 
-    <!-- Icono de "más" -->
-    <!-- <div class="viewers-container-more" *ngIf="showMoreIcon" (click)="toggleUsers()">
-      <button class="detail-more-button"><i class="fa-solid fa-circle-plus"></i></button>
-    </div> -->
-
-    <!-- Dropdown de usuarios -->
-    <!-- <div *ngIf="isDropdownOpen" class="dropdown-menu">
-      <ng-container *ngFor="let usuario of usuarios">
-        <div class="dropdown-item">{{ usuario.nombreUsuario }}</div>
-      </ng-container>
-    </div> -->
-
      <!-- Contenedor relativo para el botón y la lista desplegable -->
     <div class="viewers-container-more" *ngIf="showMoreIcon">
       <button class="detail-more-button" (click)="toggleUsers()">
@@ -37,15 +24,24 @@
       </button>
 
       <!-- Dropdown de usuarios restantes -->
-      <div *ngIf="isDropdownOpen" class="dropdown-menu">
+      <div *ngIf="isDropdownOpen" class="dropdown-menu" #dropdownMenu>
         <ng-container *ngFor="let usuario of remainingUsers">
           <div class="dropdown-item">
-            <div class="viewer-item-image">
-              <img class="viewer-item-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+            <div class="dropdown-item-content">
+              <div class="viewer-item-image">
+                <img class="viewer-item-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+                <span class="viewer-card-status"></span>
+              </div>
+              <div class="dropdown-item-body">
+                <h2 class="viewer-item-nameuser">{{ usuario.nombreUsuario }}</h2>
+                <h3 class="viewer-item-email">{{ usuario.email }}</h3>
+                <h3 class="viewer-item-positionjob"><i class="far fa-building"></i> {{ usuario.cargo }}</h3>
+              </div>
             </div>
-            <div class="dropdown-item-body">
-              <h2 class="viewer-item-nameuser">{{ usuario.nombreUsuario }}</h2>
-              <h3 class="viewer-item-email">{{ usuario.email }}</h3>
+            <div class="dropdown-item-footer">
+              <button class="detail-viewer-button"><i class="fa-regular fa-envelope"></i></button>
+              <button class="detail-viewer-button"><i class="fa-regular fa-calendar"></i></button>
+              <button class="detail-viewer-button"><i class="fa-regular fa-comment"></i></button>
             </div>
           </div>
         </ng-container>
