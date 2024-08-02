@@ -8,15 +8,15 @@ using System.Collections.Generic;
 
 namespace session_api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/notification")]
     [EnableCors("AllowAll")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class NotificationController : ControllerBase
     {
         private IHubContext<SignalHub> _hubContext;
-        public IMySessionService _mySessionService { get; set; }
+        public IUserService _mySessionService { get; set; }
 
-        public NotificationController(IHubContext<SignalHub> hubContext, IMySessionService mySessionService)
+        public NotificationController(IHubContext<SignalHub> hubContext, IUserService mySessionService)
         {
             _hubContext = hubContext;
             _mySessionService = mySessionService;
@@ -25,14 +25,14 @@ namespace session_api.Controllers
         [HttpGet("send/message/to/all")]
         public IActionResult Get()
         {
-            _hubContext.Clients.All.SendAsync("clientMethodName", "Send message to all clients");
+            _hubContext.Clients.All.SendAsync(ClientMethod.Show_Notification, "Send message to all clients");
             return Ok();
         }
 
-        [HttpGet("send/message/to/connectionId/{connectionId}")]
+        [HttpGet("send/message/to/connection/{connectionId}")]
         public IActionResult Get(string connectionId)
         {
-            _hubContext.Clients.Client(connectionId).SendAsync("clientMethodName", $"Send message to client { connectionId }");
+            _hubContext.Clients.Client(connectionId).SendAsync(ClientMethod.Show_Notification, $"Send message to client { connectionId }");
             return Ok();
         }
     }

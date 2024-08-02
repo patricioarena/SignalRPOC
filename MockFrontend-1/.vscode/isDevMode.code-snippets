@@ -1,0 +1,10 @@
+{
+	"Print to console in dev": {
+		"scope": "typescript",
+		"prefix": ["isdev", "devm"],
+		"body": [
+			"isDevMode() && console.log({$1})"
+		],
+		"description": "Log the output to the console only if we are in development mode via angular's devMode.\nRegistra la salida en la consola solo si estamos en mode desarrollo por medio del devMode de angular"
+	}
+}

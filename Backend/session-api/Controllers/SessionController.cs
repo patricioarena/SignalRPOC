@@ -8,34 +8,51 @@ using System.Collections.Generic;
 
 namespace session_api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/session")]
     [EnableCors("AllowAll")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class SessionController : ControllerBase
     {
         private IHubContext<SignalHub> _hubContext;
-        public IMySessionService _mySessionService { get; set; }
+        private IUserService _userService { get; set; }
+        private IUrlConnectionService _urlConnectionService { get; set; }
+        private IConnectionUserService _connectionUserService { get; set; }
 
-        public SessionController(IHubContext<SignalHub> hubContext, IMySessionService mySessionService)
+        public SessionController(IHubContext<SignalHub> hubContext, IUserService userService, IUrlConnectionService urlConnectionService, IConnectionUserService connectionUserService)
         {
             _hubContext = hubContext;
-            _mySessionService = mySessionService;
+            _userService = userService;
+            _urlConnectionService = urlConnectionService;
+            _connectionUserService = connectionUserService;
         }
 
-        [HttpGet("GetUsersSessions")]
-        public IActionResult GetUsersSessions()
+        [HttpGet("get/all/users")]
+        public IActionResult GetUsers()
         {
-            var dir = _mySessionService.GetUsersSessions();
+            var dir = _userService.GetAll();
             return Ok(dir);
 
         }
 
-        [HttpGet("RemoveUserSession/{connectionId}")]
-        public IActionResult RemoveUserSession(string connectionId)
+        [HttpGet("get/all/url/and/list/connections")]
+        public IActionResult GetUrlListConnections()
         {
-            var aSessionUser = _mySessionService.GetUserSessionByConnectionId(connectionId);
-            var flag = _mySessionService.RemoveUserSession(aSessionUser);
-            return Ok(flag);
+            var dir = _urlConnectionService.GetAll();
+            return Ok(dir);
+        }
+
+        [HttpGet("get/all/connection/user")]
+        public IActionResult GetConnectionUser()
+        {
+            var dir = _connectionUserService.GetAll();
+            return Ok(dir);
+
+        }
+
+        [HttpGet("remove/connection/{connectionId}/of/user/{userId}")]
+        public IActionResult RemoveCurrentConnection(string connectionId)
+        {
+            return Ok(connectionId);
         }
     }
 }
