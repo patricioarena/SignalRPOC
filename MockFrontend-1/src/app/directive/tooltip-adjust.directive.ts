@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Renderer2, HostListener, Input, AfterViewInit } from '@angular/core';
+import { Directive, ElementRef, Renderer2, Input, AfterViewInit } from '@angular/core';
 
 @Directive({
   selector: '[appTooltipAdjust]'
@@ -14,7 +14,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
   constructor(private element: ElementRef, private renderer: Renderer2) { }
 
   ngAfterViewInit(): void {
-    console.log("ENTRO EN NGAFTERVIEWINIT")
+    // console.log("ENTRO EN NGAFTERVIEWINIT")
     if(this.appTooltipAdjust){
       this.adjustTooltipPosition();
       this.adjustCardDimensions();
@@ -42,7 +42,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
 
     // Ajustar la posicion si la tarjeta se sale del margen derecho del contenedor
     if (rect.right > containerRect.right) {
-      console.log("margen derecho")
+      // console.log("margen derecho")
       const overflowRight = rect.right - containerRect.right;
       offsetLeft = Math.max(-145, offsetLeft - overflowRight);
       this.setElementStyle('left', `${offsetLeft}px`);
@@ -50,7 +50,7 @@ export class TooltipAdjustDirective implements AfterViewInit{
 
     // Ajustar la posicion si la tarjeta se sale del margen izquierdo del contenedor
     if (rect.left < containerRect.left) {
-      console.log("margen izquierdo")
+      // console.log("margen izquierdo")
       const overflowLeft = containerRect.left - rect.left;
       offsetLeft = Math.max(-100, offsetLeft + overflowLeft);
       this.setElementStyle('left', `${offsetLeft}px`);
@@ -62,22 +62,31 @@ export class TooltipAdjustDirective implements AfterViewInit{
   }
 
   private adjustCardDimensions(): void {
-    console.log("ajusto dimension card")
+    // console.log("ajusto dimension card")
+
+    // Establece el ancho maximo y minimo de la tarjeta principal
     this.setElementStyle('max-width', this.MAX_CARD_WIDTH);
     this.setElementStyle('min-width', this.MIN_CARD_WIDTH);
 
+    // Obtiene el elemento del cuerpo de la tarjeta .viewer-card-body
     const cardBody = this.element.nativeElement.querySelector('.viewer-card-body');
     if (cardBody) {
+      // Establece el ancho maximo del contenido dentro del cuerpo de la tarjeta
       this.setElementStyle('max-width', this.MAX_CONTENT_WIDTH, cardBody);
 
+      // Selecciona todos los elementos de texto dentro del cuerpo de la tarjeta
       const textElements = cardBody.querySelectorAll('*');
+
       textElements.forEach((textElement: HTMLElement) => {
+        // Establece el ancho maximo del contenido para cada elemento de texto
         this.setElementStyle('max-width', this.MAX_CONTENT_WIDTH, textElement);
-       // this.setElementStyle('font-size', this.FONT_SIZE, textElement);
+
+        // this.setElementStyle('font-size', this.FONT_SIZE, textElement);
       });
     }
   }
 
+  // Metodo para establecer el estilo a un elemento
   private setElementStyle(style: string, value: string, element: HTMLElement = this.element.nativeElement): void {
     this.renderer.setStyle(element, style, value);
   }

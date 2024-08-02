@@ -17,11 +17,16 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
   private showTimeout: any;
   private readonly hideDelay = 700;
   private readonly showDelay = 300;
-  private visibleUserCount = 10; // Número máximo de usuarios visibles inicialmente
-//  private showAll = false; // Flag para mostrar todos los usuarios
-  isDropdownOpen = false; //Controla la visibilidad del dropdown
 
-  // private styleAdjuster: StyleAdjusterService
+  // Numero maximo de usuarios visibles inicialmente
+  private visibleUserCount = 6;
+
+  // Flag para mostrar todos los usuarios
+  // private showAll = false;
+
+  //Controla la visibilidad del dropdown
+  isDropdownOpen = false;
+
   constructor(private eRef: ElementRef) {}
 
   ngOnInit(): void {
@@ -60,33 +65,40 @@ export class ViewersCardComponent implements OnInit, AfterViewInit{
     }
   }
 
-    private clearShowTimeout(): void {
+  private clearShowTimeout(): void {
     if (this.showTimeout) {
       clearTimeout(this.showTimeout);
       this.showTimeout = null;
     }
   }
 
-  // Metodo para alternar la visibilidad de los usuarios
-  toggleUsers() {
+  // Metodo para alternar la visibilidad de los usuarios del dropdown
+  toggleUsers(): void {
     // this.showAll = !this.showAll;
     // this.visibleUserCount = this.showAll ? this.usuarios.length : 10;
-    this.isDropdownOpen = !this.isDropdownOpen; //Alterna el estado del dropdown
-    console.log(this.isDropdownOpen)
+
+    // Alterna el estado del dropdown
+    this.isDropdownOpen = !this.isDropdownOpen;
+    //console.log(this.isDropdownOpen)
   }
 
-  // Obtener usuarios restantes
-  get remainingUsers() {
+  // Obtener usuarios restantes en funcion del estado
+  getRemainingUsers(): Array<any> {
     return this.usuarios.slice(this.visibleUserCount);
   }
 
+  // Metodo para contar los usuarios restantes
+  getRemainingUserCount(): number {
+    return this.getRemainingUsers().length;
+  }
+
   // Obtener usuarios visibles en funcion del estado
-  get visibleUsers() {
+  getVisibleUsers(): Array<any> {
     return this.usuarios.slice(0, this.visibleUserCount);
   }
 
   // Determinar si se debe mostrar el icono de mas
-  get showMoreIcon() {
+  shouldshowMoreIcon(): boolean {
     // return !this.showAll && this.usuarios.length > 10;
     return this.usuarios.length > this.visibleUserCount;
   }
