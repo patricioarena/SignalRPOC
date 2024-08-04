@@ -2,6 +2,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/angular,intellij+all,sublimetext,vs,yarn
 # Edit at https://www.toptal.com/developers/gitignore?templates=angular,intellij+all,sublimetext,vs,yarn
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
 ### Angular ###
 # compiled output
 dist/
