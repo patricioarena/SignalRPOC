@@ -3,6 +3,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,angular,csharp,node,visualstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,angular,csharp,node,visualstudio
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
 ### Angular ###
 ## Angular ##
 # compiled output

@@ -10,19 +10,19 @@
   <script type="text/javascript">
     var notificationsEnabled = false;
 
-    function initNotifications() {
-      if (window.Notification) {
-        Notification.requestPermission(function(permission) {
-          if (permission === 'granted') {
-            notificationsEnabled = true;
-          } else {
-            alert("You denied Notifications, it's so sad :(");
-          }
-        });
-      } else {
-        alert("Your browser doesn't support Notifications API");
-      }
-    }
+    // function initNotifications() {
+    //   if (window.Notification) {
+    //     Notification.requestPermission(function(permission) {
+    //       if (permission === 'granted') {
+    //         notificationsEnabled = true;
+    //       } else {
+    //         alert("You denied Notifications, it's so sad :(");
+    //       }
+    //     });
+    //   } else {
+    //     alert("Your browser doesn't support Notifications API");
+    //   }
+    // }
   </script>
 </head>
 <body>

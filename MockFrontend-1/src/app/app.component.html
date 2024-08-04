@@ -1,3 +1,5 @@
+
+
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
 <!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
@@ -308,11 +310,13 @@
   <span>Welcome&nbsp;{{username}},&nbsp;Connection&nbsp;ID:&nbsp;{{connectionId}}</span>
   <div class="spacer"></div>
 
+
   <body onload="initNotifications()">
     <!-- <button onclick="showNotification()">Show Notification</button> -->
   </body>
 
-    <div class="spacer"></div>
+  <app-viewers-card [usuarios]="usuarios"> </app-viewers-card>
+
     <a aria-label="Angular on twitter" target="_blank" rel="noopener" href="https://twitter.com/angular" title="Twitter">
       <svg id="twitter-logo" height="24" data-name="Logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
         <rect width="400" height="400" fill="none"/>

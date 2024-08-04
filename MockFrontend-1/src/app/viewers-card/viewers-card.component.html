@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+  <!-- Contenedor principal para los viewers (usuarios) -->
+  <div class="viewers-container" #viewersContainer>
+    <ng-container *ngFor="let usuario of getVisibleUsers()">
+      <div class="viewer-thumbnail-wrapper"
+          (mouseenter)="!isDropdownOpen && onMouseEnter(usuario)"
+          (mouseleave)="!isDropdownOpen && onMouseLeave()">
+        <!-- Contenedor para la imagen de la miniatura del usuario -->
+        <div class="viewer-thumbnail-image">
+          <img class="viewer-thumbnail-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+          <!-- Tooltip de la tarjeta de detalles del usuario que aparece al pasar el raton -->
+          <ng-container *ngIf="hoveredViewer === usuario  && !isDropdownOpen">
+            <div class="viewer-card-tooltip-container"
+                appTooltipAdjust [appTooltipAdjust]="true"
+                #viewerCardContainer
+                (mouseenter)="onMouseEnter(usuario, true)"
+                (mouseleave)="onMouseLeave()">
+               <!-- Inserta el contenido de la plantilla con la informacion del usuario -->
+              <ng-container *ngTemplateOutlet="viewerCardTemplate; context: { $implicit: usuario }"></ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+
+     <!-- Contenedor relativo para el botón y la lista desplegable -->
+    <div class="viewers-container-more" *ngIf="shouldshowMoreIcon()">
+      <!-- Boton para mostrar u ocultar la lista desplegable de usuarios restantes -->
+      <button class="detail-more-button" (click)="toggleUsers()">
+        <div class="button-content">
+          <span class="user-count" *ngIf="!isDropdownOpen">{{ getRemainingUserCount() }}</span>
+          <i class="more-icon" [ngClass]="isDropdownOpen ? 'fas fa-chevron-circle-up' : 'fa-solid fa-circle-plus'"></i>
+        </div>
+      </button>
+
+      <!-- Dropdown de usuarios restantes (solo se muestra si 'isDropdownOpen' es verdadero) -->
+      <div *ngIf="isDropdownOpen" class="dropdown-menu" #dropdownMenu>
+        <ng-container *ngFor="let usuario of getRemainingUsers()">
+          <!-- Elemento de lista para cada usuario restante -->
+          <div class="dropdown-item">
+            <div class="dropdown-item-content">
+              <!-- Imagen del usuario y estado (status) -->
+              <div class="viewer-item-image">
+                <img class="viewer-item-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+                <span class="viewer-item-status"></span>
+              </div>
+              <!-- Informacion del usuario: nombre, correo y cargo -->
+              <div class="dropdown-item-body">
+                <h2 class="viewer-item-nameuser">{{ usuario.nombreUsuario }}</h2>
+                <h3 class="viewer-item-email">{{ usuario.email }}</h3>
+                <h3 class="viewer-item-positionjob"><i class="far fa-building"></i> {{ usuario.cargo }}</h3>
+              </div>
+            </div>
+            <!-- Botones de accion para el usuario (correo, calendario, comentarios) -->
+            <div class="dropdown-item-footer">
+              <button class="detail-viewer-button"><i class="fa-regular fa-envelope"></i></button>
+              <button class="detail-viewer-button"><i class="fa-regular fa-calendar"></i></button>
+              <button class="detail-viewer-button"><i class="fa-regular fa-comment"></i></button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Plantilla para la tarjeta de detalles del usuario -->
+    <ng-template #viewerCardTemplate let-usuario>
+      <div class="viewer-card-tooltip">
+        <div class="viewer-card-content">
+          <div class="viewer-card-image">
+            <img class="viewer-card-img" [src]="usuario.imagenUsuario" [alt]="usuario.nombreUsuario">
+            <span class="viewer-card-status"></span>
+          </div>
+          <div class="viewer-card-body">
+            <h2 class="viewer-card-nameuser">{{ usuario.nombreUsuario }}</h2>
+            <h3 class="viewer-card-email">{{ usuario.email }}</h3>
+            <h3 class="viewer-card-positionjob"><i class="far fa-building"></i> {{ usuario.cargo }}</h3>
+          </div>
+        </div>
+        <div class="viewer-card-footer">
+          <button class="detail-viewer-button"><i class="fa-regular fa-envelope"></i></button>
+          <button class="detail-viewer-button"><i class="fa-regular fa-calendar"></i></button>
+          <button class="detail-viewer-button"><i class="fa-regular fa-comment"></i></button>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</body>
+</html>
