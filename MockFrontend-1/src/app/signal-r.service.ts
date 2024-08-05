@@ -2,14 +2,14 @@ import { Injectable, isDevMode } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { BehaviorSubject } from 'rxjs';
 import { ExpectedMessage } from './expected.messages';
-
+import { environment } from '../environments/environment';
+import { ServerMethod } from './server.method';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
   public connectionId$ = new BehaviorSubject(null)
-
 
   private userId: number = 12345;
   private username: string = "alice";
@@ -20,9 +20,7 @@ export class SignalRService {
   private hubConnection: signalR.HubConnection;
 
   public startConnection = () => {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`https://localhost:44385/SignalHub?userId=${this.userId}`)
-      .build();
+    this.hubConnectionBuild();
 
     this.hubConnection.start()
       .then(() => isDevMode() && console.log("Connection started"))
@@ -45,8 +43,7 @@ export class SignalRService {
 
     });
 
-
-    this.hubConnection.on('ReceivePayloadResponse', (data) => {
+    this.hubConnection.on(ExpectedMessage.received_data, (data) => {
       isDevMode() && console.log({
         data: JSON.stringify(data)
       })
@@ -57,8 +54,14 @@ export class SignalRService {
     });
   }
 
+  private hubConnectionBuild() {
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`${environment.apiUrl}SignalHub?userId=${this.userId}`)
+      .build();
+  }
+
   public notifyConnection(payload: any) {
-    this.hubConnection.invoke('NotifyConnection', payload)
+    this.hubConnection.invoke(ServerMethod.notify_connection, payload)
       .catch(err => console.error(err));
   }
 

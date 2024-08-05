@@ -1,13 +1,10 @@
 ﻿using session_api.IService;
-using session_api.Models;
-using Microsoft.AspNetCore.Http;
+using session_api.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Security.Policy;
-using session_api.CustomException;
+using session_api.Result;
 
 namespace session_api.Service
 {
@@ -33,7 +30,7 @@ namespace session_api.Service
 
         public UserService() { }
 
-        public ConcurrentDictionary<int, User> GetAll() => users;
+        public ConcurrentDictionary<int, User> GetConnectedUsers() => users;
 
         public void SetCurrentConnection(UserConnection userConnection)
         {
@@ -58,7 +55,7 @@ namespace session_api.Service
                     return Task.CompletedTask;
                 return Task.FromException(new InvalidOperationException());
             }
-            return Task.FromException(new UserNotFoundException());
+            return Task.FromException(new CustomException(CustomException.ErrorsEnum.UserNotFoundException));
         }
 
         public Task UpdateUserIfEmptyFields(Payload payload)
@@ -78,7 +75,7 @@ namespace session_api.Service
                 }
                 else
                 {
-                    return Task.FromException(new UserNotFoundException());
+                    return Task.FromException(new CustomException(CustomException.ErrorsEnum.UserNotFoundException));
                 }
             }
             catch (Exception ex)

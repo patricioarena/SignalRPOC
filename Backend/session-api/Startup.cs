@@ -15,6 +15,7 @@ using session_api.Service;
 using session_api.IService;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
+using session_api.Core;
 
 namespace session_api
 {
@@ -47,6 +48,7 @@ namespace session_api
             services.AddSingleton(typeof(ILogger), services.BuildServiceProvider().GetService<ILogger<Startup>>());
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ILoggic, Loggic>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IUrlConnectionService, UrlConnectionService>();
             services.AddSingleton<IConnectionUserService, ConnectionUserService>();

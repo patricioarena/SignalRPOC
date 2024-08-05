@@ -1,4 +1,4 @@
-﻿using session_api.Models;
+﻿using session_api.Model;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ namespace session_api.IService
     public interface IUserService
     {
         User GetUserByUserId(int userId);
-        ConcurrentDictionary<int, User> GetAll();
+        ConcurrentDictionary<int, User> GetConnectedUsers();
         Task RemoveCurrentConnectionFromUser(UserConnection userConnection);
         void SetCurrentConnection(UserConnection userConnection);
         Task UpdateUserIfEmptyFields(Payload payload);

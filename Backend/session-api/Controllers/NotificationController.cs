@@ -1,5 +1,5 @@
 ﻿using session_api.IService;
-using session_api.Models;
+using session_api.Model;
 using session_api.Signal;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

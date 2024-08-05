@@ -7,4 +7,5 @@ public static class ClientMethod
 {
     public const string Welcome = "welcome";
     public const string Show_Notification = "show_notification";
+    public const string Received_Data = "received_data";
 }

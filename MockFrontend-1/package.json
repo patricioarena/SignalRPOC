@@ -4,7 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host=127.0.0.1",
+    "start:windows": "ng serve --host=127.0.0.1 --configuration=windows",
+    "start:mac": "ng serve --host=127.0.0.1 --configuration=mac",
     "build": "ng build",
+    "build:windows": "ng build --configuration=windows",
+    "build:mac": "ng build --configuration=mac",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

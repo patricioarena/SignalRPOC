@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 #nullable enable
-namespace session_api.Models
+namespace session_api.Model
 {
     [Serializable]
     public class User

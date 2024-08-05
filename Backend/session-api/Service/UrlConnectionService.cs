@@ -1,14 +1,10 @@
 ﻿using session_api.IService;
-using session_api.Models;
-using Microsoft.AspNetCore.Http;
+using session_api.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Security.Policy;
-using session_api.CustomException;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using session_api.Result;
 
 namespace session_api.Service
 {
@@ -22,7 +18,7 @@ namespace session_api.Service
 
         public UrlConnectionService() { }
 
-        public ConcurrentDictionary<string, List<string>> GetAll() => urlListConnections;
+        public ConcurrentDictionary<string, List<string>> GetAllUrlsWithConnections() => urlListConnections;
 
         public List<string> GetListConnectionsByUrl(string url)
         {
@@ -51,7 +47,7 @@ namespace session_api.Service
                 }
                 else
                 {
-                    return Task.FromException(new NotAddedConnectionOnUrl());
+                    return Task.FromException(new CustomException(CustomException.ErrorsEnum.NotAddedConnectionOnUrl));
                 }
             }
             catch (Exception ex)

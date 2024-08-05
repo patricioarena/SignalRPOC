@@ -1,3 +1,3 @@
 export enum ServerMethod {
-  get_data = 'GetData'
+  notify_connection = 'NotifyConnection'
 }

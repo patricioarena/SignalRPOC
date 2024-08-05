@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using session_api.Models;
+using session_api.Model;
 
 namespace session_api.Controllers
 {
