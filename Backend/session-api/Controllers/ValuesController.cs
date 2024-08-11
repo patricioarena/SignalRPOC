@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace session_api.Controllers
@@ -16,7 +11,7 @@ namespace session_api.Controllers
         [HttpGet]
         public string[] Get()
         {
-            string[] collection = new string[]  { "value1", "value2" };
+            string[] collection = new string[] { "value1", "value2" };
             return collection;
         }
 
@@ -40,7 +35,7 @@ namespace session_api.Controllers
 
         // POST api/values/5
         [HttpPost("{id}")]
-        public JObject Post(int id, [FromBody]JObject data)
+        public JObject Post(int id, [FromBody] JObject data)
         {
             JObject JSON = new JObject();
             JSON.Add("POST", new JObject(new JProperty("id", id.ToString()), new JProperty("data", data)));

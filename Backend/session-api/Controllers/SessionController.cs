@@ -1,10 +1,18 @@
-﻿using session_api.IService;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using session_api.Core;
+using session_api.IService;
+using session_api.Model;
+using session_api.Service;
+using System.Collections.Generic;
 
 namespace session_api.Controllers
 {
+    /// <summary>
+    /// Para operar con los endpoints deberia: 
+    /// [ConnectionId(IsEnabled = true)] validar siempre que tiene un connectionId.
+    /// [ClientId(IsEnabled = true)] validar siempre que tiene un clientId.
+    /// </summary>
     [Route("api/session")]
     [EnableCors("AllowAll")]
     [ApiExplorerSettings(IgnoreApi = false)]
@@ -27,7 +35,7 @@ namespace session_api.Controllers
         }
 
         /// <summary>
-        /// Retrieves all connected users.
+        /// Get all connected users.
         /// </summary>
         /// <remarks>
         /// This endpoint fetches a list of all users who are currently connected.
@@ -44,7 +52,7 @@ namespace session_api.Controllers
         }
 
         /// <summary>
-        /// Retrieves all URLs and their associated connections.
+        /// Get all URLs and their associated connections.
         /// </summary>
         /// <remarks>
         /// This endpoint fetches a comprehensive list of URLs and the connections associated with each one.
@@ -61,7 +69,7 @@ namespace session_api.Controllers
         }
 
         /// <summary>
-        /// Retrieves all connections and the corresponding user-to-URL mapping details.
+        /// Get all connections and the corresponding user-to-URL mapping details.
         /// </summary>
         /// <remarks>
         /// This endpoint fetches a list of all user connections and their associated URL mappings. 
@@ -76,15 +84,47 @@ namespace session_api.Controllers
         {
             return Ok(_connectionUserService.GetAllConnectionUserMappings());
         }
-        
-        [HttpGet("get/user/for/url/{url}")]
-        public IActionResult GetConnectionUser(string url)
+
+        /// <summary>
+        /// Get all users for the corresponding base64URL.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint fetches a list of all user for the corresponding base64URL. 
+        /// http://localhost:4200/
+        /// </remarks>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing a list of users in url
+        /// in JSON format. Returns a status code 200 if the operation is successful.
+        /// </returns>
+        [HttpGet("get/user/for/url/{base64URL}")]
+        public IActionResult GetConnectionUser(string base64URL)
         {
-            System.Console.WriteLine(url);
-            var users = _loggic.GetUsersForUrl();
+            ///TODO: El mismo usuario puede tener la misma pagina en diferentes pestañas, navegadores, etc.
+            /// Para la lista de usuarios que se debe retornar tomar en cuenta que no pueden haber usuarios
+            /// repetidos para una misma pagina.
+
+            var users = _loggic.GetUsersForUrl(Decode.Base64Url(base64URL)).Result;
             return Ok(users);
         }
 
+        /// <summary>
+        /// Transform a URL to base64URL.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint transform a URL to base64URL, example:
+        /// http://localhost:4200/  is aHR0cDovL2xvY2FsaG9zdDo0MjAwLw
+        /// </remarks>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing a list of users in url
+        /// in JSON format. Returns a status code 200 if the operation is successful.
+        /// </returns>
+        [HttpPost("transform/url/to/base64URL")]
+        public IActionResult TransformUrlToBase64Url([FromBody] InputUrl inputUrl)
+        {
+            return Ok(new List<InputUrl> { inputUrl });
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("remove/connection/{connectionId}/of/user/{userId}")]
         public IActionResult RemoveCurrentConnection(string connectionId)
         {

@@ -1,14 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using session_api.Model;
+﻿using Microsoft.AspNetCore.SignalR;
 using session_api.Core;
-using Microsoft.AspNetCore.SignalR;
+using session_api.Model;
+using System;
+using System.Threading.Tasks;
 
 namespace session_api.Signal
 {
     public class SignalHub : Hub
     {
         private readonly ILoggic _loggic;
+        private readonly string HEADER_USER_ID = "UserId";
 
         public SignalHub(ILoggic loggic)
         {
@@ -17,10 +18,11 @@ namespace session_api.Signal
 
         public override Task OnConnectedAsync()
         {
-            var connectionId = Context.ConnectionId;
-            bool successful = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
+            string connectionId = Context.ConnectionId;
+            string auxUserId = Context.GetHttpContext().Request.Query[HEADER_USER_ID];
+            bool success = int.TryParse(auxUserId, out var userId);
 
-            //TODO: agregar validacion if successful false
+            //TODO: agregar validacion if success false
 
             UserConnection aUserConnection = new UserConnection
             {
@@ -36,10 +38,11 @@ namespace session_api.Signal
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var connectionId = Context.ConnectionId;
-            bool successful = int.TryParse(Context.GetHttpContext().Request.Query["userId"], out var userId);
+            string connectionId = Context.ConnectionId;
+            string auxUserId = Context.GetHttpContext().Request.Query[HEADER_USER_ID];
+            bool success = int.TryParse(auxUserId, out var userId);
 
-            //TODO: agregar validacion if successful false
+            //TODO: agregar validacion if success false
 
             UserConnection aUserConnection = new UserConnection
             {
@@ -61,18 +64,17 @@ namespace session_api.Signal
 
         public async Task NotifyConnection(Payload payload)
         {
+            ///TODO: si algunos de los datos del payload esta null 
+            /// ver como lo manejamos.
+
             await _loggic.SynchronizeUpdateData(payload);
             await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, payload);
 
-            var list = _loggic.GetUsersForUrl();
-            await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, list);
+            //var list = _loggic.GetUsersForUrl(payload.url);
+            //await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, list);
         }
 
         ///TODO: Crear un heartbeat que verifique que los clientes estan conectados periodicamente
-
-        ///TODO: El mismo usuario puede tener la misma pagina en diferentes pestañas, navegadores, etc.
-        /// Para la lista de usuarios que se debe retornar tomar en cuenta que no pueden haber usuarios
-        /// repetidos para una misma pagina.
 
         ///TODO: La data que se envia hay que wrappearla en el Result.Response
     }

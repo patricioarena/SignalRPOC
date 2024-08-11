@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 #nullable enable
 namespace session_api.Model
 {
     [Serializable]
-    public class UserUrl
-    {
-        public int userId { get; set; }
-        public string url { get; set; }
-    }
+    public record UserUrl(int UserId, string Url);
 }

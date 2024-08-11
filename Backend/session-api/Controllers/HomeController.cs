@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using session_api.Model;
+using System.Diagnostics;
 
 namespace session_api.Controllers
 {
@@ -32,8 +32,8 @@ namespace session_api.Controllers
         public IActionResult Swagger()
         {
             var baseUrl = GetBaseUrl();
-            var swaggerUrl = $"{ baseUrl }/swagger/index.html";
-            _logger.LogInformation($"Log message in the Swagger() ::> [ Redirect ] { swaggerUrl }");
+            var swaggerUrl = $"{baseUrl}/swagger/index.html";
+            _logger.LogInformation($"Log message in the Swagger() ::> [ Redirect ] {swaggerUrl}");
             return Redirect(swaggerUrl);
         }
 

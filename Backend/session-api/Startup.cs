@@ -1,21 +1,19 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Http;
-using System.Reflection;
-using System.IO;
-using Microsoft.AspNetCore.Rewrite;
-using session_api.Signal;
-using session_api.Service;
-using session_api.IService;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Linq;
 using session_api.Core;
+using session_api.IService;
+using session_api.Service;
+using session_api.Signal;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace session_api
 {

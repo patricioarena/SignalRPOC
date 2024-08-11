@@ -1,5 +1,4 @@
-﻿using session_api.Result;
-using System;
+﻿using System;
 using System.Net;
 
 namespace session_api.Result

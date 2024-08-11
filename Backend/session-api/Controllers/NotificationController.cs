@@ -1,10 +1,8 @@
-﻿using session_api.IService;
-using session_api.Model;
-using session_api.Signal;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Collections.Generic;
+using session_api.IService;
+using session_api.Signal;
 
 namespace session_api.Controllers
 {
@@ -32,7 +30,7 @@ namespace session_api.Controllers
         [HttpGet("send/message/to/connection/{connectionId}")]
         public IActionResult Get(string connectionId)
         {
-            _hubContext.Clients.Client(connectionId).SendAsync(ClientMethod.Show_Notification, $"Send message to client { connectionId }");
+            _hubContext.Clients.Client(connectionId).SendAsync(ClientMethod.Show_Notification, $"Send message to client {connectionId}");
             return Ok();
         }
     }

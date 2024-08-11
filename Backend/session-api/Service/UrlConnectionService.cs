@@ -1,10 +1,10 @@
 ﻿using session_api.IService;
 using session_api.Model;
+using session_api.Result;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using session_api.Result;
 
 namespace session_api.Service
 {
@@ -12,8 +12,8 @@ namespace session_api.Service
     {
         private ConcurrentDictionary<string, List<string>> urlListConnections = new ConcurrentDictionary<string, List<string>>()
         {
-            //["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
-            //["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
+            ["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
+            ["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
         };
 
         public UrlConnectionService() { }
@@ -68,7 +68,7 @@ namespace session_api.Service
             var urlList = urlListConnections[url];
             var isSuccessRemoved = urlList.Remove(connectionId);
 
-            if(isSuccessRemoved && urlList.Count > 0)
+            if (isSuccessRemoved && urlList.Count > 0)
                 return true;
 
             return urlList.Count == 0

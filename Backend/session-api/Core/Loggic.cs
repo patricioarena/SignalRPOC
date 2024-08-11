@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using session_api.IService;
 using session_api.Model;
-using session_api.Service;
-using session_api.Signal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace session_api.Core
@@ -38,7 +37,7 @@ namespace session_api.Core
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
-                    await _urlConnectionService.RemoveCurrentConnectionFromUrl(userConnection.connectionId, task.Result.url);
+                    await _urlConnectionService.RemoveCurrentConnectionFromUrl(userConnection.connectionId, task.Result.Url);
                 })
                 .Unwrap()
                 .ContinueWith(async task =>
@@ -92,79 +91,96 @@ namespace session_api.Core
                 _logger.LogError(methodName, task.Exception?.GetBaseException().Message);
         }
 
-        public List<User> GetUsersForUrl()
+        public async Task<List<User>> GetUsersForUrl(string url)
         {
-            _urlConnectionService.GetListConnectionsByUrl("");
-            return MockGetListUser();
+            var connections = _urlConnectionService.GetListConnectionsByUrl(url);
+            var tasks = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
+            var userUrls = await Task.WhenAll(tasks);
+            var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
+            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserId(userUrl.UserId))
+                .ToList();
+
+            return users.Concat(RandomMockEngine()).ToList();
+        }
+
+        private List<User> RandomMockEngine()
+        {
+            Random random = new Random();
+            int numberOfRandomElements = random.Next(2, 6);
+
+            return MockGetListUser()
+                .OrderBy(x => random.Next())
+                .Take(numberOfRandomElements)
+                .ToList();
         }
 
         private List<User> MockGetListUser() => new() {
             new User
             {
-                userId = 1,
+                userId = 1341,
                 username = "CyberPhoenix",
                 picture = "https://mighty.tools/mockmind-api/content/human/65.jpg",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3g", "DT89mQ4bFYHq7PpUOEfY9h" }
             },
             new User
             {
-                userId = 2,
+                userId = 1552,
                 username = "PixelWarrior",
                 picture = "https://mighty.tools/mockmind-api/content/human/45.jpg",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
             {
-                userId = 3,
+                userId = 1233,
                 username = "QuantumRider",
                 picture = "https://mighty.tools/mockmind-api/content/human/49.jpg",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9j", "DT19mQ4bFYHq7PpUOEfY9k" }
             },
             new User
             {
-                userId = 4,
+                userId = 1864,
                 username = "NeonSpecter",
                 picture = "https://mighty.tools/mockmind-api/content/human/4.jpg",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 5,
+                userId = 1275,
                 username = "DarkPhoenix",
                 picture = "https://mighty.tools/mockmind-api/content/cartoon/7.jpg",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3h", "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
             {
-                userId = 6,
+                userId = 1176,
                 username = "PixelPerfect",
                 picture = "https://mighty.tools/mockmind-api/content/cartoon/10.jpg",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9j" }
             },
             new User
             {
-                userId = 7,
+                userId = 1447,
                 username = "GenericPerson",
                 picture = "https://mighty.tools/mockmind-api/content/human/42.jpg",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 8,
+                userId = 1208,
                 username = "NeoFox",
                 picture = "https://mighty.tools/mockmind-api/content/human/55.jpg",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 9,
+                userId = 1489,
                 username = "Rick",
                 picture = "https://mighty.tools/mockmind-api/content/cartoon/11.jpg",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 10,
+                userId = 1710,
                 username = "Morty",
                 picture = "https://mighty.tools/mockmind-api/content/human/56.jpg",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
