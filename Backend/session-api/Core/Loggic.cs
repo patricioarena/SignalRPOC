@@ -97,10 +97,12 @@ namespace session_api.Core
             var tasks = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
             var userUrls = await Task.WhenAll(tasks);
             var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
-            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId).Result)
-                .ToList();
+            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId));
+            var userUrlsw = await Task.WhenAll(users);
 
-            return users.Concat(RandomMockEngine()).ToList();
+            return userUrlsw.ToList()
+                .Concat(RandomMockEngine())
+                .ToList();
         }
 
         private List<User> RandomMockEngine()
