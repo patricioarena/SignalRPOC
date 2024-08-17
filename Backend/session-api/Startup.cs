@@ -64,7 +64,7 @@ namespace session_api
 
             services.AddSignalR(options =>
             {
-                options.EnableDetailedErrors = true;
+                options.EnableDetailedErrors = false;
             });
 
             services.AddCors(options =>

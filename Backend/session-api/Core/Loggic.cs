@@ -55,27 +55,27 @@ namespace session_api.Core
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
-                    await _userService.RemoveCurrentConnectionFromUser(userConnection: userConnection);
+                    await _userService.RemoveCurrentConnectionFromUserAsync(userConnection: userConnection);
                 })
                 .Unwrap()
-                .ContinueWith(task => LogTaskError(nameof(_userService.RemoveCurrentConnectionFromUser), task));
+                .ContinueWith(task => LogTaskError(nameof(_userService.RemoveCurrentConnectionFromUserAsync), task));
         }
 
         public async Task SynchronizeUpdateData(Payload payload)
         {
-            await _userService.UpdateUserIfEmptyFields(payload)
+            await _userService.UpdateUser(payload)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_userService.UpdateUserIfEmptyFields), task);
+                    LogTaskError(nameof(_userService.UpdateUser), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
-                    await _urlConnectionService.AddConnectionToListConnectionsIfNotExist(payload);
+                    await _urlConnectionService.SetCurrentConnectionToUrlAsync(payload);
                 })
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_urlConnectionService.AddConnectionToListConnectionsIfNotExist), task);
+                    LogTaskError(nameof(_urlConnectionService.SetCurrentConnectionToUrlAsync), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -93,11 +93,11 @@ namespace session_api.Core
 
         public async Task<List<User>> GetUsersForUrl(string url)
         {
-            var connections = _urlConnectionService.GetListConnectionsByUrl(url);
+            var connections = await _urlConnectionService.GetListConnectionsByUrlAsync(url);
             var tasks = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
             var userUrls = await Task.WhenAll(tasks);
             var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
-            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserId(userUrl.UserId))
+            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId).Result)
                 .ToList();
 
             return users.Concat(RandomMockEngine()).ToList();
@@ -114,12 +114,17 @@ namespace session_api.Core
                 .ToList();
         }
 
-        private List<User> MockGetListUser() => new() {
+        private List<User> MockGetListUser() => new()
+        {
             new User
             {
                 userId = 1341,
                 username = "CyberPhoenix",
                 picture = "https://mighty.tools/mockmind-api/content/human/65.jpg",
+                mail = "cyberphoenix@example.com",
+                fullname = "Phoenix Blaze",
+                position = "Software Engineer",
+                Role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3g", "DT89mQ4bFYHq7PpUOEfY9h" }
             },
             new User
@@ -127,6 +132,10 @@ namespace session_api.Core
                 userId = 1552,
                 username = "PixelWarrior",
                 picture = "https://mighty.tools/mockmind-api/content/human/45.jpg",
+                mail = "pixelwarrior@example.com",
+                fullname = "Warren Pixels",
+                position = "Graphic Designer",
+                Role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
@@ -134,6 +143,10 @@ namespace session_api.Core
                 userId = 1233,
                 username = "QuantumRider",
                 picture = "https://mighty.tools/mockmind-api/content/human/49.jpg",
+                mail = "quantumrider@example.com",
+                fullname = "Quinn Rider",
+                position = "Data Scientist",
+                Role = "Moderator",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9j", "DT19mQ4bFYHq7PpUOEfY9k" }
             },
             new User
@@ -141,6 +154,10 @@ namespace session_api.Core
                 userId = 1864,
                 username = "NeonSpecter",
                 picture = "https://mighty.tools/mockmind-api/content/human/4.jpg",
+                mail = "neonspecter@example.com",
+                fullname = "Samantha Specter",
+                position = "UI/UX Designer",
+                Role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
@@ -148,6 +165,10 @@ namespace session_api.Core
                 userId = 1275,
                 username = "DarkPhoenix",
                 picture = "https://mighty.tools/mockmind-api/content/cartoon/7.jpg",
+                mail = "darkphoenix@example.com",
+                fullname = "Damian Phoenix",
+                position = "DevOps Engineer",
+                Role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3h", "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
@@ -155,6 +176,10 @@ namespace session_api.Core
                 userId = 1176,
                 username = "PixelPerfect",
                 picture = "https://mighty.tools/mockmind-api/content/cartoon/10.jpg",
+                mail = "pixelperfect@example.com",
+                fullname = "Patricia Pixels",
+                position = "Photographer",
+                Role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9j" }
             },
             new User
@@ -162,6 +187,10 @@ namespace session_api.Core
                 userId = 1447,
                 username = "GenericPerson",
                 picture = "https://mighty.tools/mockmind-api/content/human/42.jpg",
+                mail = "genericperson@example.com",
+                fullname = "George Person",
+                position = "Content Writer",
+                Role = "User",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
@@ -169,6 +198,10 @@ namespace session_api.Core
                 userId = 1208,
                 username = "NeoFox",
                 picture = "https://mighty.tools/mockmind-api/content/human/55.jpg",
+                mail = "neofox@example.com",
+                fullname = "Natalie Fox",
+                position = "Frontend Developer",
+                Role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
@@ -176,6 +209,10 @@ namespace session_api.Core
                 userId = 1489,
                 username = "Rick",
                 picture = "https://mighty.tools/mockmind-api/content/cartoon/11.jpg",
+                mail = "rick@example.com",
+                fullname = "Rick Sanchez",
+                position = "Scientist",
+                Role = "Admin",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
@@ -183,9 +220,14 @@ namespace session_api.Core
                 userId = 1710,
                 username = "Morty",
                 picture = "https://mighty.tools/mockmind-api/content/human/56.jpg",
+                mail = "morty@example.com",
+                fullname = "Morty Smith",
+                position = "Student",
+                Role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             }
         };
+
     }
 }
 

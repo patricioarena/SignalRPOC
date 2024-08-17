@@ -14,7 +14,11 @@ namespace session_api.Result
             NotAddedConnectionOnUrl = 1000,
             NotAddedMapping = 1001,
             NotFoundException = 1002,
-            UserNotFoundException = 1003
+            UserNotFoundException = 1003,
+            ConnectionAlreadyExistsForUrl = 1004,
+            ConnectionAlreadyExists = 1005,
+            UrlNotFound = 1006,
+            UserAlreadyExists = 1007
         }
 
         public int ErrorCode { get; }
@@ -26,7 +30,11 @@ namespace session_api.Result
                 { ErrorsEnum.NotAddedConnectionOnUrl, "Conexión no agregada." },
                 { ErrorsEnum.NotAddedMapping, "Mapeo no agregado." },
                 { ErrorsEnum.NotFoundException, "No encontrado." },
-                { ErrorsEnum.UserNotFoundException, "Usuario no encontrado." }
+                { ErrorsEnum.UserNotFoundException, "Usuario no encontrado." },
+                { ErrorsEnum.ConnectionAlreadyExistsForUrl, "La conexion existe para la url"},
+                { ErrorsEnum.ConnectionAlreadyExists, "La conexion existe"},
+                { ErrorsEnum.UrlNotFound, "La url no existe"},
+                { ErrorsEnum.UserAlreadyExists,"El usuario ya existe" }
             };
 
             EnsureAllErrorDescriptions();

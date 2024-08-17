@@ -6,10 +6,10 @@ namespace session_api.IService
 {
     public interface IUserService
     {
-        User GetUserByUserId(int userId);
-        ConcurrentDictionary<int, User> GetConnectedUsers();
-        Task RemoveCurrentConnectionFromUser(UserConnection userConnection);
-        void SetCurrentConnection(UserConnection userConnection);
-        Task UpdateUserIfEmptyFields(Payload payload);
+        Task<User> GetUserByUserIdAsync(int userId);
+        ConcurrentDictionary<int, User> GetAllConnectedUsers();
+        Task RemoveCurrentConnectionFromUserAsync(UserConnection userConnection);
+        Task SetCurrentConnection(UserConnection userConnection);
+        Task UpdateUser(Payload payload);
     }
 }

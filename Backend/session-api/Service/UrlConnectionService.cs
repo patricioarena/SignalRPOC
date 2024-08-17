@@ -1,6 +1,6 @@
-﻿using session_api.IService;
+﻿using Microsoft.Extensions.Logging;
+using session_api.IService;
 using session_api.Model;
-using session_api.Result;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,57 +10,62 @@ namespace session_api.Service
 {
     public class UrlConnectionService : IUrlConnectionService
     {
+        private readonly ILogger _logger;
+
         private ConcurrentDictionary<string, List<string>> urlListConnections = new ConcurrentDictionary<string, List<string>>()
         {
             ["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
             ["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
         };
 
-        public UrlConnectionService() { }
+        public UrlConnectionService(ILogger<UrlConnectionService> logger) { _logger = logger; }
 
         public ConcurrentDictionary<string, List<string>> GetAllUrlsWithConnections() => urlListConnections;
 
-        public List<string> GetListConnectionsByUrl(string url)
+        public async Task<List<string>> GetListConnectionsByUrlAsync(string url)
         {
-            return urlListConnections.TryGetValue(url, out List<string> listConnection) ? listConnection : null;
+            return urlListConnections.TryGetValue(url, out List<string> listConnection)
+                ? await Task.FromResult(listConnection)
+                : await Task.FromResult<List<string>>(null);
         }
 
-        // TODO: Se puede separar en dos add y update, creo
-        public Task AddConnectionToListConnectionsIfNotExist(Payload payload)
+        public async Task SetCurrentConnectionToUrlAsync(Payload payload)
         {
-            try
-            {
-                var existingList = GetListConnectionsByUrl(payload.url);
-                if (existingList == null)
-                {
-                    urlListConnections.TryAdd(payload.url, new List<string> { payload.connectionId });
-                    return Task.CompletedTask; // Representa éxito sin valor de retorno
-                }
-
-                if (existingList != null)
-                {
-                    if (!urlListConnections[payload.url].Contains(payload.connectionId))
-                    {
-                        urlListConnections[payload.url].Add(payload.connectionId);
-                    }
-                    return Task.CompletedTask; // Representa éxito sin valor de retorno
-                }
-                else
-                {
-                    return Task.FromException(new CustomException(CustomException.ErrorsEnum.NotAddedConnectionOnUrl));
-                }
-            }
-            catch (Exception ex)
-            {
-                return Task.FromException(ex); // Representa error en caso de excepción
-            }
+            var existingList = await GetListConnectionsByUrlAsync(payload.url);
+            Func<Task> action = (existingList == null)
+                ? new Func<Task>(async () => await AddConnectionToUrlAsync(existingList, payload))
+                : new Func<Task>(async () => await UpdateConnectionInUrlAsync(existingList, payload));
+            await action();
         }
+
+        private async Task AddConnectionToUrlAsync(List<string> existingList, Payload payload)
+        {
+
+            Func<Task> action = (existingList == null)
+                ? new Func<Task>(async () => await AddConnection(payload))
+                : new Func<Task>(async () => await Task.Yield());
+            action();
+        }
+
+        private async Task AddConnection(Payload payload) => await Task.Run(() =>
+        {
+            urlListConnections.TryAdd(payload.url, new List<string> { payload.connectionId });
+        });
+
+        private async Task UpdateConnectionInUrlAsync(List<string> existingList, Payload payload)
+        {
+
+            Func<Task> action = (existingList != null) && noExistConnectionIdInList(existingList, payload.connectionId)
+                ? new Func<Task>(async () => await Task.Run(() => existingList.Add(payload.connectionId)))
+                : new Func<Task>(async () => await Task.Yield());
+            action();
+        }
+
+        private static bool noExistConnectionIdInList(List<string> existingList, string connectionId) => !existingList.Contains(connectionId);
 
         public Task RemoveCurrentConnectionFromUrl(string connectionId, string url)
         {
-            return RemoveConnectionFromUrl(connectionId, url)
-                ? Task.CompletedTask
-                : Task.FromException(new InvalidOperationException());
+            return Task.FromResult(RemoveConnectionFromUrl(connectionId, url));
         }
 
         private bool RemoveConnectionFromUrl(string connectionId, string url)

@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace session_api.IService;
-
 public interface IUrlConnectionService
 {
-    List<string> GetListConnectionsByUrl(string url);
+
     ConcurrentDictionary<string, List<string>> GetAllUrlsWithConnections();
-    Task AddConnectionToListConnectionsIfNotExist(Payload payload);
+    Task<List<string>> GetListConnectionsByUrlAsync(string url);
     Task RemoveCurrentConnectionFromUrl(string connectionId, string url);
+    Task SetCurrentConnectionToUrlAsync(Payload payload);
+
 }

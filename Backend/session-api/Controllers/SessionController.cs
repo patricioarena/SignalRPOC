@@ -48,7 +48,7 @@ namespace session_api.Controllers
         [HttpGet("get/all/users/connected")]
         public IActionResult GetUsers()
         {
-            return Ok(_userService.GetConnectedUsers());
+            return Ok(_userService.GetAllConnectedUsers());
         }
 
         /// <summary>

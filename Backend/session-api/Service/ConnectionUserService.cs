@@ -46,9 +46,7 @@ namespace session_api.Service
 
         public Task RemoveCurrentConnectionFromConnectionUser(string connectionId)
         {
-            return RemoveConnectionFromConnectionUser(connectionId)
-                ? Task.CompletedTask
-                : Task.FromException(new InvalidOperationException());
+            return Task.FromResult(RemoveConnectionFromConnectionUser(connectionId));
         }
 
         public bool RemoveConnectionFromConnectionUser(string connectionId)
