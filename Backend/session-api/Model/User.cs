@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 #nullable enable
-namespace session_api.Models
+namespace session_api.Model
 {
     [Serializable]
     public class User
@@ -12,6 +11,11 @@ namespace session_api.Models
         public int userId { get; set; }
         public string? username { get; set; }
         public string? picture { get; set; }
+        public string? mail { get; set; }
+        public string? fullname { get; set; }
+        public string? position { get; set; }
+        public string? Role { get; set; }
+        [JsonIgnore]
         public List<string> connections { get; set; } = new List<string>();
     }
 }

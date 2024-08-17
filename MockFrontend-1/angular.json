@@ -65,6 +65,22 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "mac": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.mac.ts"
+                }
+              ]
+            },
+            "windows": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.windows.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": ""
@@ -77,6 +93,12 @@
           "configurations": {
             "production": {
               "browserTarget": "SignalRPOC:build:production"
+            },
+            "mac": {
+              "browserTarget": "SignalRPOC:build:mac"
+            },
+            "windows": {
+              "browserTarget": "SignalRPOC:build:windows"
             }
           }
         },
@@ -125,6 +147,12 @@
           "configurations": {
             "production": {
               "devServerTarget": "SignalRPOC:serve:production"
+            },
+            "mac": {
+              "devServerTarget": "SignalRPOC:serve:mac"
+            },
+            "windows": {
+              "devServerTarget": "SignalRPOC:serve:windows"
             }
           }
         }

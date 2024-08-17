@@ -1,16 +1,15 @@
-﻿using session_api.Models;
+﻿using session_api.Model;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace session_api.IService
 {
     public interface IUserService
     {
-        User GetUserByUserId(int userId);
-        ConcurrentDictionary<int, User> GetAll();
-        Task RemoveCurrentConnectionFromUser(UserConnection userConnection);
-        void SetCurrentConnection(UserConnection userConnection);
-        Task UpdateUserIfEmptyFields(Payload payload);
+        Task<User> GetUserByUserIdAsync(int userId);
+        ConcurrentDictionary<int, User> GetAllConnectedUsers();
+        Task RemoveCurrentConnectionFromUserAsync(UserConnection userConnection);
+        Task SetCurrentConnection(UserConnection userConnection);
+        Task UpdateUser(Payload payload);
     }
 }

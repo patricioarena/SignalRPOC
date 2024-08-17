@@ -1,6 +1,4 @@
-using System;
-
-namespace session_api.Models
+namespace session_api.Model
 {
     public class ErrorViewModel
     {

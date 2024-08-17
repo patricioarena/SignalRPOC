@@ -1,9 +1,9 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { HubConnection } from '@aspnet/signalr';
-import * as signalR from '@aspnet/signalr';
+import { HubConnection } from '@microsoft/signalr';
+import * as signalR from '@microsoft/signalr';
 import { Usuario } from './Usuario';
-import { SignalRService } from './signal-r.service';
+import { SignalRService } from './services/signal-r/signal-r.service';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
   public ngOnInit() {
     this.signalRService.startConnection();
     this.signalRService.connectionId$.subscribe((id: string) => {
-        this.connectionId = id;
+      this.connectionId = id;
     })
   }
 

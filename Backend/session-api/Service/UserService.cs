@@ -1,104 +1,117 @@
-﻿using session_api.IService;
-using session_api.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.Extensions.Logging;
+using session_api.IService;
+using session_api.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Security.Policy;
-using session_api.CustomException;
 
 namespace session_api.Service
 {
     public class UserService : IUserService
     {
+        private readonly ILogger _logger;
+
         private ConcurrentDictionary<int, User> users = new ConcurrentDictionary<int, User>()
         {
-            //[3456] = new User
-            //{
-            //    userId = 3456,
-            //    username = "Erik",
-            //    picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
-            //    connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
-            //},
-            //[6788] = new User 
-            //{ 
-            //    userId = 6788, 
-            //    username = "Charles", 
-            //    picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
-            //    connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
-            //}
+            [3456] = new User
+            {
+                userId = 3456,
+                username = "Erik",
+                picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
+                connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
+            },
+            [6788] = new User
+            {
+                userId = 6788,
+                username = "Charles",
+                picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
+                connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
+            }
         };
 
-        public UserService() { }
+        public UserService(ILogger<UserService> logger) { _logger = logger; }
 
-        public ConcurrentDictionary<int, User> GetAll() => users;
+        public ConcurrentDictionary<int, User> GetAllConnectedUsers() => users;
 
-        public void SetCurrentConnection(UserConnection userConnection)
+        public async Task<User> GetUserByUserIdAsync(int userId)
         {
-            var existingUser = GetUserByUserId(userConnection.userId);
-            Action action = (existingUser != null)
-                ? new Action(() => UpdateExistingUserWithCurrentConnection(userConnection, userConnection.connectionId))
-                : new Action(() => AddNewUserWithCurrentConnection(userConnection));
+            return users.TryGetValue(userId, out User userSession)
+                ? await Task.FromResult(userSession)
+                : await Task.FromResult<User>(null);
+        }
+
+        public async Task SetCurrentConnection(UserConnection userConnection)
+        {
+            var existingUser = await GetUserByUserIdAsync(userConnection.userId);
+            Func<Task> action = (existingUser == null)
+                ? new Func<Task>(async () => await AddNewUserWithCurrentConnection(existingUser, userConnection))
+                : new Func<Task>(async () => await UpdateExistingUserWithCurrentConnection(existingUser, userConnection));
             action();
         }
 
-        public User GetUserByUserId(int userId)
+        private async Task AddNewUserWithCurrentConnection(User existingUser, UserConnection userConnection)
         {
-            return users.TryGetValue(userId, out User userSession) ? userSession : null;
+            Func<Task> action = (existingUser == null)
+                ? new Func<Task>(async () => await AddNewUser(userConnection))
+                : new Func<Task>(async () => await Task.Yield());
+            action();
         }
 
-        public Task RemoveCurrentConnectionFromUser(UserConnection userConnection)
+        private async Task AddNewUser(UserConnection userConnection) => await Task.Run(() =>
         {
-            var existingUser = GetUserByUserId(userConnection.userId);
-            if (existingUser != null)
-            {
-                if (RemoveConnectionFromUser(existingUser, userConnection.connectionId))
-                    return Task.CompletedTask;
-                return Task.FromException(new InvalidOperationException());
-            }
-            return Task.FromException(new UserNotFoundException());
-        }
-
-        public Task UpdateUserIfEmptyFields(Payload payload)
-        {
-            try
-            {
-                var existingUser = GetUserByUserId(payload.userId);
-                if (existingUser != null)
-                {
-                    if (string.IsNullOrEmpty(existingUser.username))
-                        existingUser.username = payload.username;
-
-                    if (string.IsNullOrEmpty(existingUser.picture))
-                        existingUser.picture = payload.picture;
-
-                    return Task.CompletedTask; // Representa éxito sin valor de retorno
-                }
-                else
-                {
-                    return Task.FromException(new UserNotFoundException());
-                }
-            }
-            catch (Exception ex)
-            {
-                return Task.FromException(ex); // Representa error en caso de excepción
-            }
-        }
-
-        private void UpdateExistingUserWithCurrentConnection(UserConnection existingUserConnection, string connectionId)
-        {
-            users[existingUserConnection.userId].connections.Add(connectionId);
-        }
-
-        private void AddNewUserWithCurrentConnection(UserConnection userSession)
-        {
-            var newUser = new User { userId = userSession.userId, connections = new List<string> { userSession.connectionId } };
+            var newUser = buidUser(userConnection.userId, userConnection.connectionId);
             users.TryAdd(newUser.userId, newUser);
+        });
+
+        private static User buidUser(int userId, string connectionId) => new User { userId = userId, connections = new List<string> { connectionId } };
+
+        private async Task UpdateExistingUserWithCurrentConnection(User existingUser, UserConnection userConnection)
+        {
+            Func<Task> action = (existingUser == null)
+                ? new Func<Task>(async () => users[existingUser.userId].connections.Add(userConnection.connectionId))
+                : new Func<Task>(async () => await Task.Yield());
+            action();
         }
 
-        private bool RemoveConnectionFromUser(User user, string connectionId)
+        public async Task UpdateUser(Payload payload)
+        {
+            var existingUser = await GetUserByUserIdAsync(payload.userId);
+            Func<Task> action = (existingUser != null)
+                ? new Func<Task>(async () => await UpdateUserIfEmptyFieldsAsync(payload, existingUser))
+                : new Func<Task>(async () => await Task.Yield());
+            await action();
+        }
+
+        private static async Task UpdateUserIfEmptyFieldsAsync(Payload payload, User existingUser)
+        {
+            async Task UpdateFieldsAsync()
+            {
+                if (string.IsNullOrEmpty(existingUser.username))
+                    existingUser.username = payload.username;
+
+                if (string.IsNullOrEmpty(existingUser.picture))
+                    existingUser.picture = payload.picture;
+            }
+            await UpdateFieldsAsync();
+        }
+
+        public async Task RemoveCurrentConnectionFromUserAsync(UserConnection userConnection)
+        {
+
+            var existingUser = await GetUserByUserIdAsync(userConnection.userId);
+            Func<Task> action = (existingUser != null)
+                ? new Func<Task>(async () => await RemoveConnectionFromUser(existingUser, userConnection.connectionId))
+                : new Func<Task>(async () => await Task.Yield());
+            action();
+        }
+
+        public Task RemoveConnectionFromUser(User user, string connectionId)
+        {
+            return Task.FromResult(RemoveConnection(user, connectionId));
+        }
+
+        private bool RemoveConnection(User user, string connectionId)
         {
             var index = user.userId;
             var isSuccessRemoved = user.connections.Remove(connectionId);
