@@ -94,13 +94,13 @@ namespace session_api.Core
         public async Task<List<User>> GetUsersForUrl(string url)
         {
             var connections = await _urlConnectionService.GetListConnectionsByUrlAsync(url);
-            var tasks = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
-            var userUrls = await Task.WhenAll(tasks);
+            var tasksUserUrls = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
+            var userUrls = await Task.WhenAll(tasksUserUrls);
             var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
-            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId));
-            var userUrlsw = await Task.WhenAll(users);
+            var tasksUsers = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId));
+            var users = await Task.WhenAll(tasksUsers);
 
-            return userUrlsw.ToList()
+            return users.ToList()
                 .Concat(RandomMockEngine())
                 .ToList();
         }
