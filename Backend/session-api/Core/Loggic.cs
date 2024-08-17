@@ -93,16 +93,58 @@ namespace session_api.Core
 
         public async Task<List<User>> GetUsersForUrl(string url)
         {
-            var connections = await _urlConnectionService.GetListConnectionsByUrlAsync(url);
-            var tasksUserUrls = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
-            var userUrls = await Task.WhenAll(tasksUserUrls);
-            var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
+            List<User> result = new List<User>();
+            await _urlConnectionService.GetListConnectionsByUrlAsync(url)
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(nameof(_urlConnectionService.GetListConnectionsByUrlAsync), task);
+
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    return await extractUniqueUserUrls(task);
+                })
+                .Unwrap()
+                .ContinueWith(async task =>
+                {
+                    LogTaskError(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
+
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    return await extractUserOfUniqueUserUrls(task);
+                })
+                .Unwrap()
+                .ContinueWith(task =>
+                {
+                    LogTaskError(nameof(_userService.GetUserByUserIdAsync), task);
+
+                    if (!task.IsFaulted)
+                    {
+                        result = task.Result
+                            .Concat(RandomMockEngine())
+                            .ToList();
+                    }
+                });
+
+            return result;
+        }
+
+        private async Task<List<User>> extractUserOfUniqueUserUrls(Task<HashSet<UserUrl>> task)
+        {
+            var uniqueUserUrls = task.Result;
             var tasksUsers = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId));
             var users = await Task.WhenAll(tasksUsers);
 
-            return users.ToList()
-                .Concat(RandomMockEngine())
-                .ToList();
+            return users.ToList();
+        }
+
+        private async Task<HashSet<UserUrl>> extractUniqueUserUrls(Task<List<string>> task)
+        {
+            var connections = task.Result;
+            var tasksUserUrls = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
+            var userUrls = await Task.WhenAll(tasksUserUrls);
+            var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
+
+            return uniqueUserUrls;
         }
 
         private List<User> RandomMockEngine()
