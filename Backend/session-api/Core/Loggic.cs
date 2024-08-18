@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using session_api.IService;
 using session_api.Model;
+using session_api.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,6 +129,17 @@ namespace session_api.Core
             return result;
         }
 
+        public List<User> GetConnectionUserWithFiter(string base64URL, int? exclude)
+        {
+            var decodedUrl = Decode.Base64Url(base64URL);
+            var users = GetUsersForUrl(decodedUrl).Result;
+
+            // Aplicar filtro si es necesario
+            return (exclude.HasValue)
+                ? users.Where(user => user.userId != exclude.Value).ToList()
+                : users;
+        }
+
         private async Task<List<User>> extractUserOfUniqueUserUrls(Task<HashSet<UserUrl>> task)
         {
             var uniqueUserUrls = task.Result;
@@ -168,7 +180,7 @@ namespace session_api.Core
                 mail = "cyberphoenix@example.com",
                 fullname = "Phoenix Blaze",
                 position = "Software Engineer",
-                Role = "Admin",
+                role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3g", "DT89mQ4bFYHq7PpUOEfY9h" }
             },
             new User
@@ -179,7 +191,7 @@ namespace session_api.Core
                 mail = "pixelwarrior@example.com",
                 fullname = "Warren Pixels",
                 position = "Graphic Designer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
@@ -190,7 +202,7 @@ namespace session_api.Core
                 mail = "quantumrider@example.com",
                 fullname = "Quinn Rider",
                 position = "Data Scientist",
-                Role = "Moderator",
+                role = "Moderator",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9j", "DT19mQ4bFYHq7PpUOEfY9k" }
             },
             new User
@@ -201,7 +213,7 @@ namespace session_api.Core
                 mail = "neonspecter@example.com",
                 fullname = "Samantha Specter",
                 position = "UI/UX Designer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
@@ -212,7 +224,7 @@ namespace session_api.Core
                 mail = "darkphoenix@example.com",
                 fullname = "Damian Phoenix",
                 position = "DevOps Engineer",
-                Role = "Admin",
+                role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3h", "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
@@ -223,7 +235,7 @@ namespace session_api.Core
                 mail = "pixelperfect@example.com",
                 fullname = "Patricia Pixels",
                 position = "Photographer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9j" }
             },
             new User
@@ -234,7 +246,7 @@ namespace session_api.Core
                 mail = "genericperson@example.com",
                 fullname = "George Person",
                 position = "Content Writer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
@@ -245,7 +257,7 @@ namespace session_api.Core
                 mail = "neofox@example.com",
                 fullname = "Natalie Fox",
                 position = "Frontend Developer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
@@ -256,7 +268,7 @@ namespace session_api.Core
                 mail = "rick@example.com",
                 fullname = "Rick Sanchez",
                 position = "Scientist",
-                Role = "Admin",
+                role = "Admin",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
@@ -267,7 +279,7 @@ namespace session_api.Core
                 mail = "morty@example.com",
                 fullname = "Morty Smith",
                 position = "Student",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             }
         };

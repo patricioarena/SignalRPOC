@@ -14,7 +14,7 @@ namespace session_api.Model
         public string? mail { get; set; }
         public string? fullname { get; set; }
         public string? position { get; set; }
-        public string? Role { get; set; }
+        public string? role { get; set; }
         [JsonIgnore]
         public List<string> connections { get; set; } = new List<string>();
     }

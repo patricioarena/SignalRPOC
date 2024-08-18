@@ -31,7 +31,7 @@ namespace session_api.Service
 
         public async Task SetCurrentConnectionToUrlAsync(Payload payload)
         {
-            var existingList = await GetListConnectionsByUrlAsync(payload.url);
+            var existingList = await GetListConnectionsByUrlAsync(payload.GetDecodeUrl());
             Func<Task> action = (existingList == null)
                 ? new Func<Task>(async () => await AddConnectionToUrlAsync(existingList, payload))
                 : new Func<Task>(async () => await UpdateConnectionInUrlAsync(existingList, payload));
@@ -49,7 +49,7 @@ namespace session_api.Service
 
         private async Task AddConnection(Payload payload) => await Task.Run(() =>
         {
-            urlListConnections.TryAdd(payload.url, new List<string> { payload.connectionId });
+            urlListConnections.TryAdd(payload.GetDecodeUrl(), new List<string> { payload.connectionId });
         });
 
         private async Task UpdateConnectionInUrlAsync(List<string> existingList, Payload payload)

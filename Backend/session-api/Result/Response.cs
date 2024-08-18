@@ -7,19 +7,28 @@ namespace session_api.Result
     {
         private object data1;
 
-        public Response(HttpStatusCode ok, String message = null, T data = null)
+        public Response(T data = null)
         {
-            this.ok = ok;
+            this.statusCode = HttpStatusCode.OK;
             this.data = data;
-            this.message = message;
+            this.message = null;
         }
 
-        public Response(HttpStatusCode ok, String message = null, T data = null, String developerMessage = null)
+        public Response(HttpStatusCode statusCode, String message = null, T data = null, String developerMessage = null)
         {
-            this.ok = ok;
+            this.statusCode = statusCode;
             this.data = data;
             this.message = message;
             this.developerMessage = developerMessage;
+        }
+
+        public Response(HttpStatusCode statusCode, String message = null, T data = null, String developerMessage = null, int errorCode = 0)
+        {
+            this.statusCode = statusCode;
+            this.data = data;
+            this.message = message;
+            this.developerMessage = developerMessage;
+            this.errorCode = errorCode;
         }
 
         public Response(Exception e)
@@ -27,7 +36,7 @@ namespace session_api.Result
             this.data = null;
             if (e is CustomException)
             {
-                this.ok = HttpStatusCode.PreconditionFailed;
+                this.statusCode = HttpStatusCode.PreconditionFailed;
                 this.message = "ha ocurrido un error de aplicacion";
                 this.data = null;
                 this.errorCode = ((CustomException)e).ErrorCode;
@@ -35,7 +44,7 @@ namespace session_api.Result
             }
             else
             {
-                this.ok = HttpStatusCode.InternalServerError;
+                this.statusCode = HttpStatusCode.InternalServerError;
                 this.message = "ha ocurrido un error no controlado";
                 if ((e.InnerException != null) && (e.InnerException.Message != null))
                     this.developerMessage = e.InnerException.Message;
@@ -44,14 +53,14 @@ namespace session_api.Result
             }
         }
 
-        public Response(HttpStatusCode oK, string message, object data1)
+        public Response(HttpStatusCode statusCode, string message, object data1)
         {
-            ok = oK;
+            this.statusCode = statusCode;
             this.message = message;
             this.data1 = data1;
         }
 
-        public HttpStatusCode ok { get; set; }
+        public HttpStatusCode statusCode { get; set; }
         public String message { get; set; }
         public T data { get; set; }
         public String developerMessage { get; set; }

@@ -17,8 +17,9 @@ namespace session_api.Result
             UserNotFoundException = 1003,
             ConnectionAlreadyExistsForUrl = 1004,
             ConnectionAlreadyExists = 1005,
-            UrlNotFound = 1006,
-            UserAlreadyExists = 1007
+            PageUrlNotFound = 1006,
+            UserAlreadyExists = 1007,
+            Base64UrlNotFound = 1008
         }
 
         public int ErrorCode { get; }
@@ -31,10 +32,11 @@ namespace session_api.Result
                 { ErrorsEnum.NotAddedMapping, "Mapeo no agregado." },
                 { ErrorsEnum.NotFoundException, "No encontrado." },
                 { ErrorsEnum.UserNotFoundException, "Usuario no encontrado." },
-                { ErrorsEnum.ConnectionAlreadyExistsForUrl, "La conexion existe para la url"},
+                { ErrorsEnum.ConnectionAlreadyExistsForUrl, "La conexion existe para la pageUrl"},
                 { ErrorsEnum.ConnectionAlreadyExists, "La conexion existe"},
-                { ErrorsEnum.UrlNotFound, "La url no existe"},
-                { ErrorsEnum.UserAlreadyExists,"El usuario ya existe" }
+                { ErrorsEnum.PageUrlNotFound, "Atributo pageUrl no encontrado"},
+                { ErrorsEnum.UserAlreadyExists,"El usuario ya existe" },
+                { ErrorsEnum.Base64UrlNotFound,"Atributo Base64Url no encontrado" }
             };
 
             EnsureAllErrorDescriptions();

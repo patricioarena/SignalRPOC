@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using session_api.Core;
 using session_api.Model;
+using session_api.Result;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace session_api.Signal
@@ -32,7 +34,7 @@ namespace session_api.Signal
 
             _loggic.SetCurrentConnection(userConnection: aUserConnection);
 
-            Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, aUserConnection);
+            Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, new Response<UserConnection>(aUserConnection));
             return base.OnConnectedAsync();
         }
 
@@ -68,10 +70,13 @@ namespace session_api.Signal
             /// ver como lo manejamos.
 
             await _loggic.SynchronizeUpdateData(payload);
-            await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, payload);
+            //await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, new Response<Payload>(payload));
 
-            //var list = _loggic.GetUsersForUrl(payload.url);
-            //await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, list);
+            var users = _loggic.GetConnectionUserWithFiter(payload.pageUrl, payload.userId);
+
+            await Clients.Client(payload.connectionId)
+                .SendAsync(ClientMethod.Received_Data,
+                    new Response<List<User>>(users));
         }
 
         ///TODO: Crear un heartbeat que verifique que los clientes estan conectados periodicamente

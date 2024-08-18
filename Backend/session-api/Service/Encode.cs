@@ -1,37 +1,11 @@
-﻿using System;
+﻿using session_api.Validator;
+using System;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
 
 namespace session_api.Service;
 
 public static class Encode
 {
-    // Expresión regular para validar URL que comienzan con http o https
-    private static readonly string UrlPattern = @"^https?:\/\/";
-
-    // Expresión regular para verificar si la URL contiene codificación en porcentaje
-    private static readonly string PercentEncodedPattern = @"%[0-9A-Fa-f]{2}";
-
-    /// <summary>
-    /// Valida si la cadena de entrada es una URL válida para la codificación en Base64 URL.
-    ///
-    /// Verifica que la URL, después de decodificar el formato de codificación de porcentaje, comience con 'http://' o 'https://'.
-    ///
-    /// </summary>
-    /// <param name="input">La cadena a validar.</param>
-    /// <returns>Verdadero si la URL es válida; de lo contrario, falso.</returns>
-    public static bool IsValidUrl(string input)
-    {
-        if (string.IsNullOrEmpty(input)) { return false; }
-
-        // Si la URL contiene codificación en porcentaje, decodificarla
-        if (Regex.IsMatch(input, PercentEncodedPattern)) { input = HttpUtility.UrlDecode(input); }
-
-        // Usar expresión regular para validar que la URL (decodificada o no) comienza con 'http://' o 'https://'
-        return Regex.IsMatch(input, UrlPattern, RegexOptions.IgnoreCase);
-    }
-
     /// <summary>
     /// Codifica una cadena en Base64 URL según la especificación RFC 4648.
     ///
@@ -56,7 +30,7 @@ public static class Encode
     /// <returns>La cadena codificada en Base64 URL.</returns>
     public static string Base64Url(string input)
     {
-        if (!IsValidUrl(input)) { return null; }
+        if (!IsValidUrl.Test(input)) { return null; }
 
         try
         {

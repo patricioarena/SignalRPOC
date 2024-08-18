@@ -11,6 +11,7 @@ namespace session_api.Core
         Task SynchronizeUpdateData(Payload payload);
         void LogTaskError(string methodName, Task task);
         Task<List<User>> GetUsersForUrl(string url);
+        List<User> GetConnectionUserWithFiter(string base64URL, int? exclude);
     }
 }
 

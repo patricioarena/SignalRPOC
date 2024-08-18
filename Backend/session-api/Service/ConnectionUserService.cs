@@ -36,7 +36,7 @@ namespace session_api.Service
                 {
                     if (task.IsFaulted)
                     {
-                        connectionUser.TryAdd(payload.connectionId, new UserUrl(payload.userId, payload.url));
+                        connectionUser.TryAdd(payload.connectionId, new UserUrl(payload.userId, payload.GetDecodeUrl()));
                         return Task.CompletedTask;
                     }
                     ///TODO: Crear un heartbeat que verifique que los clientes estan conectados periodicamente

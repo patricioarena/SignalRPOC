@@ -17,15 +17,23 @@ namespace session_api.Service
             [3456] = new User
             {
                 userId = 3456,
-                username = "Erik",
+                username = "NeutralPhoenix",
                 picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
+                mail = "neutralphoenix@example.com",
+                fullname = "Erik Phoenix",
+                position = "Software Engineer",
+                role = "Admin",
                 connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
             },
             [6788] = new User
             {
                 userId = 6788,
-                username = "Charles",
-                picture = "https://i.pinimg.com/736x/ea/23/51/ea23510c375c824096adb31b127a6064.jpg",
+                username = "TheProfesor",
+                picture = "https://pm1.aminoapps.com/6437/03d7f5b0003df2e7a8b94ae5a5ef553548d344b6_00.jpg",
+                mail = "theprofesor@marvel.com",
+                fullname = "Charles Xavier",
+                position = "Profesor",
+                role = "Admin",
                 connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
             }
         };
@@ -90,8 +98,21 @@ namespace session_api.Service
                 if (string.IsNullOrEmpty(existingUser.username))
                     existingUser.username = payload.username;
 
+                if (string.IsNullOrEmpty(existingUser.fullname))
+                    existingUser.fullname = payload.fullname;
+
+                if (string.IsNullOrEmpty(existingUser.mail))
+                    existingUser.mail = payload.mail;
+
                 if (string.IsNullOrEmpty(existingUser.picture))
-                    existingUser.picture = payload.picture;
+                    existingUser.picture = payload.GetDecodePictureUrl();
+
+                if (string.IsNullOrEmpty(existingUser.position))
+                    existingUser.position = payload.position;
+
+                if (string.IsNullOrEmpty(existingUser.role))
+                    existingUser.role = payload.role;
+
             }
             await UpdateFieldsAsync();
         }
