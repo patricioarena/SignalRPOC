@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using session_api.IService;
 using session_api.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace session_api.Service
@@ -12,13 +14,27 @@ namespace session_api.Service
     {
         private readonly ILogger _logger;
 
-        private ConcurrentDictionary<string, List<string>> urlListConnections = new ConcurrentDictionary<string, List<string>>()
-        {
-            ["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
-            ["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
-        };
+        private readonly IConfiguration _configuration;
 
-        public UrlConnectionService(ILogger<UrlConnectionService> logger) { _logger = logger; }
+        private ConcurrentDictionary<string, List<string>> urlListConnections = new ConcurrentDictionary<string, List<string>>();
+        public UrlConnectionService(ILogger<UrlConnectionService> logger, IConfiguration configuration)
+        {
+            _logger = logger;
+            _configuration = configuration;
+            UrlListConnectionsMock();
+        }
+
+        private void UrlListConnectionsMock()
+        {
+            ConcurrentDictionary<string, List<string>> urlListConnectionsMock = new ConcurrentDictionary<string, List<string>>()
+            {
+                ["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
+                ["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
+            };
+
+            if (_configuration.GetValue<bool>("Mock:PreLoadData"))
+                urlListConnections.Concat(urlListConnectionsMock);
+        }
 
         public ConcurrentDictionary<string, List<string>> GetAllUrlsWithConnections() => urlListConnections;
 
@@ -31,7 +47,7 @@ namespace session_api.Service
 
         public async Task SetCurrentConnectionToUrlAsync(Payload payload)
         {
-            var existingList = await GetListConnectionsByUrlAsync(payload.url);
+            var existingList = await GetListConnectionsByUrlAsync(payload.GetDecodeUrl());
             Func<Task> action = (existingList == null)
                 ? new Func<Task>(async () => await AddConnectionToUrlAsync(existingList, payload))
                 : new Func<Task>(async () => await UpdateConnectionInUrlAsync(existingList, payload));
@@ -40,7 +56,6 @@ namespace session_api.Service
 
         private async Task AddConnectionToUrlAsync(List<string> existingList, Payload payload)
         {
-
             Func<Task> action = (existingList == null)
                 ? new Func<Task>(async () => await AddConnection(payload))
                 : new Func<Task>(async () => await Task.Yield());
@@ -49,12 +64,11 @@ namespace session_api.Service
 
         private async Task AddConnection(Payload payload) => await Task.Run(() =>
         {
-            urlListConnections.TryAdd(payload.url, new List<string> { payload.connectionId });
+            urlListConnections.TryAdd(payload.GetDecodeUrl(), new List<string> { payload.connectionId });
         });
 
         private async Task UpdateConnectionInUrlAsync(List<string> existingList, Payload payload)
         {
-
             Func<Task> action = (existingList != null) && noExistConnectionIdInList(existingList, payload.connectionId)
                 ? new Func<Task>(async () => await Task.Run(() => existingList.Add(payload.connectionId)))
                 : new Func<Task>(async () => await Task.Yield());

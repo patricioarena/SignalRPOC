@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using session_api.IService;
 using session_api.Model;
+using session_api.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +13,27 @@ namespace session_api.Core
     public class Loggic : ILoggic
     {
         private readonly ILogger _logger;
+
         private readonly IUserService _userService;
+
         private readonly IUrlConnectionService _urlConnectionService;
+
         private readonly IConnectionUserService _connectionUserService;
+
+        private readonly IConfiguration _configuration;
 
         public Loggic(ILogger<Loggic> logger,
             IUserService userService, IUrlConnectionService urlConnectionService,
-            IConnectionUserService connectionUserService)
+            IConnectionUserService connectionUserService,
+            IConfiguration configuration)
         {
             _logger = logger;
             _userService = userService;
             _urlConnectionService = urlConnectionService;
             _connectionUserService = connectionUserService;
+            _configuration = configuration;
         }
+        public async Task<User> GetUserByUserId(int userId) => await _userService.GetUserByUserIdAsync(userId);
 
         public void SetCurrentConnection(UserConnection userConnection) =>
             _userService.SetCurrentConnection(userConnection: userConnection);
@@ -33,7 +43,7 @@ namespace session_api.Core
             await _connectionUserService.GetUserUrlByConnectionId(userConnection.connectionId)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
+                    LogTaskFaulted(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -42,7 +52,7 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_urlConnectionService.RemoveCurrentConnectionFromUrl), task);
+                    LogTaskFaulted(nameof(_urlConnectionService.RemoveCurrentConnectionFromUrl), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -51,14 +61,14 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_connectionUserService.RemoveCurrentConnectionFromConnectionUser), task);
+                    LogTaskFaulted(nameof(_connectionUserService.RemoveCurrentConnectionFromConnectionUser), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
                     await _userService.RemoveCurrentConnectionFromUserAsync(userConnection: userConnection);
                 })
                 .Unwrap()
-                .ContinueWith(task => LogTaskError(nameof(_userService.RemoveCurrentConnectionFromUserAsync), task));
+                .ContinueWith(task => LogTaskFaulted(nameof(_userService.RemoveCurrentConnectionFromUserAsync), task));
         }
 
         public async Task SynchronizeUpdateData(Payload payload)
@@ -66,7 +76,7 @@ namespace session_api.Core
             await _userService.UpdateUser(payload)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_userService.UpdateUser), task);
+                    LogTaskFaulted(nameof(_userService.UpdateUser), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -75,32 +85,93 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_urlConnectionService.SetCurrentConnectionToUrlAsync), task);
+                    LogTaskFaulted(nameof(_urlConnectionService.SetCurrentConnectionToUrlAsync), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
                     await _connectionUserService.AddMapConnectionIdUserId(payload);
                 })
                 .Unwrap()
-                .ContinueWith(task => LogTaskError(nameof(_connectionUserService.AddMapConnectionIdUserId), task));
+                .ContinueWith(task => LogTaskFaulted(nameof(_connectionUserService.AddMapConnectionIdUserId), task));
         }
 
-        public void LogTaskError(string methodName, Task task)
+        public void LogTaskFaulted(string methodName, Task task)
         {
             if (task.IsFaulted)
-                _logger.LogError(methodName, task.Exception?.GetBaseException().Message);
+                _logger.LogDebug(methodName, task.Exception?.GetBaseException().Message);
         }
 
         public async Task<List<User>> GetUsersForUrl(string url)
         {
-            var connections = await _urlConnectionService.GetListConnectionsByUrlAsync(url);
-            var tasks = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
-            var userUrls = await Task.WhenAll(tasks);
-            var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
-            var users = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId).Result)
-                .ToList();
+            List<User> result = new List<User>();
+            await _urlConnectionService.GetListConnectionsByUrlAsync(url)
+                .ContinueWith(async task =>
+                {
+                    LogTaskFaulted(nameof(_urlConnectionService.GetListConnectionsByUrlAsync), task);
 
-            return users.Concat(RandomMockEngine()).ToList();
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    return await extractUniqueUserUrls(task);
+                })
+                .Unwrap()
+                .ContinueWith(async task =>
+                {
+                    LogTaskFaulted(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
+
+                    if (task.IsFaulted)
+                        await Task.FromException(task.Exception);
+                    return await extractUserOfUniqueUserUrls(task);
+                })
+                .Unwrap()
+                .ContinueWith(task =>
+                {
+                    LogTaskFaulted(nameof(_userService.GetUserByUserIdAsync), task);
+
+                    if (task.IsFaulted)
+                    {
+                        if (_configuration.GetValue<bool>("Mock:ExtraResult"))
+                            result = result.Concat(RandomMockEngine()).ToList();
+                    }
+
+                    if (!task.IsFaulted)
+                    {
+                        result = _configuration.GetValue<bool>("Mock:ExtraResult")
+                            ? task.Result.Concat(RandomMockEngine()).ToList()
+                            : task.Result.ToList();
+                    }
+                });
+
+            return result;
+        }
+
+        public async Task<List<User>> GetConnectionUserWithFiterAsync(string base64URL, int? exclude)
+        {
+            var decodedUrl = Decode.Base64Url(base64URL);
+            var users = GetUsersForUrl(decodedUrl).Result;
+
+            // Aplicar filtro si es necesario
+            return (exclude.HasValue)
+                ? await Task.FromResult(users.Where(user => user.userId != exclude.Value).ToList())
+                : await Task.FromResult(users);
+        }
+
+        private async Task<List<User>> extractUserOfUniqueUserUrls(Task<HashSet<UserUrl>> task)
+        {
+            var uniqueUserUrls = task.Result;
+            var tasksUsers = uniqueUserUrls.Select(userUrl => _userService.GetUserByUserIdAsync(userUrl.UserId));
+            var users = await Task.WhenAll(tasksUsers);
+
+            return users.ToList();
+        }
+
+        private async Task<HashSet<UserUrl>> extractUniqueUserUrls(Task<List<string>> task)
+        {
+            var connections = task.Result;
+            var tasksUserUrls = connections.Select(_connectionUserService.GetUserUrlByConnectionId);
+            var userUrls = await Task.WhenAll(tasksUserUrls);
+            var uniqueUserUrls = new HashSet<UserUrl>(userUrls);
+
+            return uniqueUserUrls;
         }
 
         private List<User> RandomMockEngine()
@@ -124,7 +195,7 @@ namespace session_api.Core
                 mail = "cyberphoenix@example.com",
                 fullname = "Phoenix Blaze",
                 position = "Software Engineer",
-                Role = "Admin",
+                role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3g", "DT89mQ4bFYHq7PpUOEfY9h" }
             },
             new User
@@ -135,7 +206,7 @@ namespace session_api.Core
                 mail = "pixelwarrior@example.com",
                 fullname = "Warren Pixels",
                 position = "Graphic Designer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
@@ -146,7 +217,7 @@ namespace session_api.Core
                 mail = "quantumrider@example.com",
                 fullname = "Quinn Rider",
                 position = "Data Scientist",
-                Role = "Moderator",
+                role = "Moderator",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9j", "DT19mQ4bFYHq7PpUOEfY9k" }
             },
             new User
@@ -157,7 +228,7 @@ namespace session_api.Core
                 mail = "neonspecter@example.com",
                 fullname = "Samantha Specter",
                 position = "UI/UX Designer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
@@ -168,7 +239,7 @@ namespace session_api.Core
                 mail = "darkphoenix@example.com",
                 fullname = "Damian Phoenix",
                 position = "DevOps Engineer",
-                Role = "Admin",
+                role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3h", "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
@@ -179,7 +250,7 @@ namespace session_api.Core
                 mail = "pixelperfect@example.com",
                 fullname = "Patricia Pixels",
                 position = "Photographer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9j" }
             },
             new User
@@ -190,7 +261,7 @@ namespace session_api.Core
                 mail = "genericperson@example.com",
                 fullname = "George Person",
                 position = "Content Writer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
@@ -201,7 +272,7 @@ namespace session_api.Core
                 mail = "neofox@example.com",
                 fullname = "Natalie Fox",
                 position = "Frontend Developer",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
@@ -212,7 +283,7 @@ namespace session_api.Core
                 mail = "rick@example.com",
                 fullname = "Rick Sanchez",
                 position = "Scientist",
-                Role = "Admin",
+                role = "Admin",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
@@ -223,11 +294,10 @@ namespace session_api.Core
                 mail = "morty@example.com",
                 fullname = "Morty Smith",
                 position = "Student",
-                Role = "User",
+                role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             }
         };
-
     }
 }
 

@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using session_api.Core;
 using session_api.IService;
+using session_api.Model;
 using session_api.Service;
 using session_api.Signal;
 using System;
@@ -51,7 +53,24 @@ namespace session_api
             services.AddSingleton<IUrlConnectionService, UrlConnectionService>();
             services.AddSingleton<IConnectionUserService, ConnectionUserService>();
 
-            services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            // Registra todos los validadores en el ensamblado
+            services.AddValidatorsFromAssemblyContaining<Payload>();
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+            });
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+            });
+
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
             services.AddSwaggerGen(c =>

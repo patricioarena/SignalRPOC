@@ -12,8 +12,8 @@ import { EncodeService } from "./encode-service";
 export class SignalRService {
   public connectionId$ = new BehaviorSubject(null)
 
-  private userId: number = 12345;
-  private username: string = "alice";
+  private userId: number = 1234;
+  private username: string = "Falice";
   private picture: string = "https://i.pinimg.com/originals/35/0e/dd/350edd537688ad50ea3c5615e02ba84e.jpg"
   private actualUrl: string = "http://localhost:4200/"
 
@@ -31,17 +31,21 @@ export class SignalRService {
       .then((res) => isDevMode() && console.log("Connection started", res))
       .catch(err => console.error("Error while starting connection: " + err));
 
-    this.hubConnection.on(ExpectedMessage.welcome, (data) => {
-      isDevMode() && console.log(`Welcome: ${JSON.stringify(data)}`);
-      this.connectionId = data.connectionId;
+    this.hubConnection.on(ExpectedMessage.welcome, (response) => {
+      isDevMode() && console.log(`Welcome: ${JSON.stringify(response)}`);
+      this.connectionId = response.data.connectionId;
       this.connectionId$.next(this.connectionId);
 
       const payload = {
         userId: this.userId,
         username: this.username,
         connectionId: this.connectionId,
-        url: this.encodeService.base64Url(this.actualUrl),
-        picture: this.encodeService.base64Url(this.picture)
+        pageUrl: this.encodeService.base64Url(this.actualUrl),
+        pictureUrl: this.encodeService.base64Url(this.picture),
+        mail: "alice@example.com",
+        fullname: "Alice Fox",
+        position: "Frontend Developer",
+        role: "Reviewer"
       }
 
       this.notifyConnection(payload);
@@ -49,8 +53,8 @@ export class SignalRService {
     });
 
     this.manageReceivedData()
-
     this.manageNotifications()
+    this.manageValidationError()
   }
 
   private hubConnectionBuild() {
@@ -80,7 +84,13 @@ export class SignalRService {
 
   private manageReceivedData() {
     this.hubConnection.on(ExpectedMessage.received_data, (data) => {
-      isDevMode() && console.log({data: data})
+      isDevMode() && console.log({received_data: data})
+    });
+  }
+
+  private manageValidationError() {
+    this.hubConnection.on(ExpectedMessage.validation_error, (data) => {
+      isDevMode() && console.log({validation_error: data})
     });
   }
 }

@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
+using session_api.Contant;
 using session_api.Core;
 using session_api.Model;
+using session_api.Result;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace session_api.Signal
@@ -9,11 +14,15 @@ namespace session_api.Signal
     public class SignalHub : Hub
     {
         private readonly ILoggic _loggic;
+        private readonly IConfiguration _configuration;
+        private readonly IValidator<Payload> _payloadValidator;
         private readonly string HEADER_USER_ID = "UserId";
 
-        public SignalHub(ILoggic loggic)
+        public SignalHub(ILoggic loggic, IValidator<Payload> payloadValidator, IConfiguration configuration)
         {
             _loggic = loggic;
+            _payloadValidator = payloadValidator;
+            _configuration = configuration;
         }
 
         public override Task OnConnectedAsync()
@@ -32,7 +41,11 @@ namespace session_api.Signal
 
             _loggic.SetCurrentConnection(userConnection: aUserConnection);
 
-            Clients.Client(connectionId).SendAsync(ClientMethod.Welcome, aUserConnection);
+            Clients.Client(connectionId)
+                .SendAsync(ClientMethod.Welcome,
+                    Response<UserConnection, object>.Builder()
+                    .SetData(aUserConnection)
+                    .Build());
             return base.OnConnectedAsync();
         }
 
@@ -53,7 +66,7 @@ namespace session_api.Signal
             await _loggic.SynchronizeRemoveData(aUserConnection)
                 .ContinueWith(async task =>
                 {
-                    _loggic.LogTaskError(nameof(_loggic.SynchronizeRemoveData), task);
+                    _loggic.LogTaskFaulted(nameof(_loggic.SynchronizeRemoveData), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -64,14 +77,55 @@ namespace session_api.Signal
 
         public async Task NotifyConnection(Payload payload)
         {
-            ///TODO: si algunos de los datos del payload esta null 
-            /// ver como lo manejamos.
+            var validationResult = _payloadValidator.Validate(payload);
 
-            await _loggic.SynchronizeUpdateData(payload);
-            await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, payload);
+            if (!validationResult.IsValid)
+            {
+                await Clients.Caller.SendAsync(ClientMethod.Validation_Error, validationResult.Errors);
+                return;
+            }
 
-            //var list = _loggic.GetUsersForUrl(payload.url);
-            //await Clients.Client(payload.connectionId).SendAsync(ClientMethod.Received_Data, list);
+            await _loggic.SynchronizeUpdateData(payload)
+                .ContinueWith(async task =>
+                {
+                    if (!task.IsFaulted && _configuration.GetValue<bool>("ReturnTheUserCreatedFromPayload"))
+                    {
+                        var data = _loggic.GetUserByUserId(payload.userId).Result;
+                        var metadata = new Dictionary<string, object>
+                        {
+                            [Metadata.TypeData] = Metadata.Object,
+                        };
+
+                        await Clients.Client(payload.connectionId)
+                            .SendAsync(ClientMethod.Received_Data,
+                                 Response<User, object>.Builder()
+                                 .SetData(data)
+                                 .SetMetadata(metadata)
+                                 .Build());
+                    }
+                })
+                .Unwrap();
+
+            await _loggic.GetConnectionUserWithFiterAsync(payload.pageUrl, payload.userId)
+                .ContinueWith(async task =>
+                {
+                    if (!task.IsFaulted)
+                    {
+                        var data = task.Result;
+                        var metadata = new Dictionary<string, object>
+                        {
+                            [Metadata.TypeData] = Metadata.Array,
+                        };
+
+                        await Clients.Client(payload.connectionId)
+                            .SendAsync(ClientMethod.Received_Data,
+                                Response<List<User>, object>.Builder()
+                                .SetData(data)
+                                .SetMetadata(metadata)
+                                .Build());
+                    }
+                })
+                .Unwrap();
         }
 
         ///TODO: Crear un heartbeat que verifique que los clientes estan conectados periodicamente

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using session_api.Core;
 using session_api.IService;
 using session_api.Model;
-using session_api.Service;
+using session_api.Result;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 
 namespace session_api.Controllers
 {
@@ -16,17 +19,19 @@ namespace session_api.Controllers
     [Route("api/session")]
     [EnableCors("AllowAll")]
     [ApiExplorerSettings(IgnoreApi = false)]
-    public class SessionController : ControllerBase
+    public class SessionController : CustomController
     {
-        private IUserService _userService { get; set; }
-        private IUrlConnectionService _urlConnectionService { get; set; }
-        private IConnectionUserService _connectionUserService { get; set; }
-        private ILoggic _loggic { get; set; }
+        private readonly IUserService _userService;
+        private readonly IUrlConnectionService _urlConnectionService;
+        private readonly IConnectionUserService _connectionUserService;
+        private readonly ILoggic _loggic;
 
-        public SessionController(IUserService userService,
+        public SessionController(
+            ILogger<SessionController> _logger,
+            IUserService userService,
             IUrlConnectionService urlConnectionService,
             IConnectionUserService connectionUserService,
-            ILoggic loggic)
+            ILoggic loggic) : base(_logger)
         {
             _userService = userService;
             _urlConnectionService = urlConnectionService;
@@ -48,7 +53,12 @@ namespace session_api.Controllers
         [HttpGet("get/all/users/connected")]
         public IActionResult GetUsers()
         {
-            return Ok(_userService.GetAllConnectedUsers());
+            var response = Response<ConcurrentDictionary<int, User>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_userService.GetAllConnectedUsers())
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -65,7 +75,12 @@ namespace session_api.Controllers
         [HttpGet("get/all/urls/with/connections")]
         public IActionResult GetUrlListConnections()
         {
-            return Ok(_urlConnectionService.GetAllUrlsWithConnections());
+            var response = Response<ConcurrentDictionary<string, List<string>>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_urlConnectionService.GetAllUrlsWithConnections())
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -82,29 +97,41 @@ namespace session_api.Controllers
         [HttpGet("get/all/connection/user/mappings")]
         public IActionResult GetConnectionUser()
         {
-            return Ok(_connectionUserService.GetAllConnectionUserMappings());
+            var response = Response<ConcurrentDictionary<string, UserUrl>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_connectionUserService.GetAllConnectionUserMappings())
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
-        /// Get all users for the corresponding base64URL.
+        /// Retrieves all users associated with the specified Base64-encoded URL.
         /// </summary>
         /// <remarks>
-        /// This endpoint fetches a list of all user for the corresponding base64URL. 
-        /// http://localhost:4200/
+        /// This endpoint fetches a list of all users corresponding to the provided Base64-encoded URL. 
+        /// For example, `http://localhost:4200/` is encoded as `aHR0cDovL2xvY2FsaG9zdDo0MjAwLw`.
+        /// The list of users returned will exclude any duplicates based on their URL access.
+        /// Optionally, a specific user can be excluded from the results by providing their ID via the <paramref name="exclude"/> parameter.
         /// </remarks>
+        /// <param name="base64URL">The Base64-encoded URL representing the target page.</param>
+        /// <param name="exclude">
+        /// An optional user ID to exclude from the list of returned users. 
+        /// If provided, the user with this ID will not be included in the result.
+        /// </param>
         /// <returns>
-        /// An <see cref="IActionResult"/> containing a list of users in url
-        /// in JSON format. Returns a status code 200 if the operation is successful.
+        /// An <see cref="IActionResult"/> containing a JSON-formatted list of users associated with the given URL. 
+        /// Returns a status code 200 if the operation is successful.
         /// </returns>
-        [HttpGet("get/user/for/url/{base64URL}")]
-        public IActionResult GetConnectionUser(string base64URL)
+        [HttpGet("get/user/for/pageUrl/{base64URL}")]
+        public IActionResult GetConnectionUser(string base64URL, int? exclude = null)
         {
-            ///TODO: El mismo usuario puede tener la misma pagina en diferentes pestañas, navegadores, etc.
-            /// Para la lista de usuarios que se debe retornar tomar en cuenta que no pueden haber usuarios
-            /// repetidos para una misma pagina.
+            var response = Response<List<User>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_loggic.GetConnectionUserWithFiterAsync(base64URL, exclude).Result)
+                .Build();
 
-            var users = _loggic.GetUsersForUrl(Decode.Base64Url(base64URL)).Result;
-            return Ok(users);
+            return Ok(response);
         }
 
         /// <summary>
@@ -115,13 +142,16 @@ namespace session_api.Controllers
         /// http://localhost:4200/  is aHR0cDovL2xvY2FsaG9zdDo0MjAwLw
         /// </remarks>
         /// <returns>
-        /// An <see cref="IActionResult"/> containing a list of users in url
+        /// An <see cref="IActionResult"/> containing a list of users in pageUrl
         /// in JSON format. Returns a status code 200 if the operation is successful.
         /// </returns>
-        [HttpPost("transform/url/to/base64URL")]
+        [HttpPost("transform/pageUrl/to/base64URL")]
         public IActionResult TransformUrlToBase64Url([FromBody] InputUrl inputUrl)
         {
-            return Ok(new List<InputUrl> { inputUrl });
+            return Ok(Response<InputUrl, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(inputUrl)
+                .Build());
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
