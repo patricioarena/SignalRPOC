@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using session_api.IService;
 using session_api.Model;
 using session_api.Service;
@@ -12,19 +13,27 @@ namespace session_api.Core
     public class Loggic : ILoggic
     {
         private readonly ILogger _logger;
+
         private readonly IUserService _userService;
+
         private readonly IUrlConnectionService _urlConnectionService;
+
         private readonly IConnectionUserService _connectionUserService;
+
+        private readonly IConfiguration _configuration;
 
         public Loggic(ILogger<Loggic> logger,
             IUserService userService, IUrlConnectionService urlConnectionService,
-            IConnectionUserService connectionUserService)
+            IConnectionUserService connectionUserService,
+            IConfiguration configuration)
         {
             _logger = logger;
             _userService = userService;
             _urlConnectionService = urlConnectionService;
             _connectionUserService = connectionUserService;
+            _configuration = configuration;
         }
+        public async Task<User> GetUserByUserId(int userId) => await _userService.GetUserByUserIdAsync(userId);
 
         public void SetCurrentConnection(UserConnection userConnection) =>
             _userService.SetCurrentConnection(userConnection: userConnection);
@@ -34,7 +43,7 @@ namespace session_api.Core
             await _connectionUserService.GetUserUrlByConnectionId(userConnection.connectionId)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
+                    LogTaskFaulted(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -43,7 +52,7 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_urlConnectionService.RemoveCurrentConnectionFromUrl), task);
+                    LogTaskFaulted(nameof(_urlConnectionService.RemoveCurrentConnectionFromUrl), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -52,14 +61,14 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_connectionUserService.RemoveCurrentConnectionFromConnectionUser), task);
+                    LogTaskFaulted(nameof(_connectionUserService.RemoveCurrentConnectionFromConnectionUser), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
                     await _userService.RemoveCurrentConnectionFromUserAsync(userConnection: userConnection);
                 })
                 .Unwrap()
-                .ContinueWith(task => LogTaskError(nameof(_userService.RemoveCurrentConnectionFromUserAsync), task));
+                .ContinueWith(task => LogTaskFaulted(nameof(_userService.RemoveCurrentConnectionFromUserAsync), task));
         }
 
         public async Task SynchronizeUpdateData(Payload payload)
@@ -67,7 +76,7 @@ namespace session_api.Core
             await _userService.UpdateUser(payload)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_userService.UpdateUser), task);
+                    LogTaskFaulted(nameof(_userService.UpdateUser), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -76,20 +85,20 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_urlConnectionService.SetCurrentConnectionToUrlAsync), task);
+                    LogTaskFaulted(nameof(_urlConnectionService.SetCurrentConnectionToUrlAsync), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
                     await _connectionUserService.AddMapConnectionIdUserId(payload);
                 })
                 .Unwrap()
-                .ContinueWith(task => LogTaskError(nameof(_connectionUserService.AddMapConnectionIdUserId), task));
+                .ContinueWith(task => LogTaskFaulted(nameof(_connectionUserService.AddMapConnectionIdUserId), task));
         }
 
-        public void LogTaskError(string methodName, Task task)
+        public void LogTaskFaulted(string methodName, Task task)
         {
             if (task.IsFaulted)
-                _logger.LogError(methodName, task.Exception?.GetBaseException().Message);
+                _logger.LogDebug(methodName, task.Exception?.GetBaseException().Message);
         }
 
         public async Task<List<User>> GetUsersForUrl(string url)
@@ -98,7 +107,7 @@ namespace session_api.Core
             await _urlConnectionService.GetListConnectionsByUrlAsync(url)
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_urlConnectionService.GetListConnectionsByUrlAsync), task);
+                    LogTaskFaulted(nameof(_urlConnectionService.GetListConnectionsByUrlAsync), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -107,7 +116,7 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskError(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
+                    LogTaskFaulted(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -116,28 +125,34 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(task =>
                 {
-                    LogTaskError(nameof(_userService.GetUserByUserIdAsync), task);
+                    LogTaskFaulted(nameof(_userService.GetUserByUserIdAsync), task);
+
+                    if (task.IsFaulted)
+                    {
+                        if (_configuration.GetValue<bool>("Mock:ExtraResult"))
+                            result = result.Concat(RandomMockEngine()).ToList();
+                    }
 
                     if (!task.IsFaulted)
                     {
-                        result = task.Result
-                            .Concat(RandomMockEngine())
-                            .ToList();
+                        result = _configuration.GetValue<bool>("Mock:ExtraResult")
+                            ? task.Result.Concat(RandomMockEngine()).ToList()
+                            : task.Result.ToList();
                     }
                 });
 
             return result;
         }
 
-        public List<User> GetConnectionUserWithFiter(string base64URL, int? exclude)
+        public async Task<List<User>> GetConnectionUserWithFiterAsync(string base64URL, int? exclude)
         {
             var decodedUrl = Decode.Base64Url(base64URL);
             var users = GetUsersForUrl(decodedUrl).Result;
 
             // Aplicar filtro si es necesario
             return (exclude.HasValue)
-                ? users.Where(user => user.userId != exclude.Value).ToList()
-                : users;
+                ? await Task.FromResult(users.Where(user => user.userId != exclude.Value).ToList())
+                : await Task.FromResult(users);
         }
 
         private async Task<List<User>> extractUserOfUniqueUserUrls(Task<HashSet<UserUrl>> task)
@@ -283,7 +298,6 @@ namespace session_api.Core
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             }
         };
-
     }
 }
 

@@ -53,8 +53,8 @@ export class SignalRService {
     });
 
     this.manageReceivedData()
-
     this.manageNotifications()
+    this.manageValidationError()
   }
 
   private hubConnectionBuild() {
@@ -84,7 +84,13 @@ export class SignalRService {
 
   private manageReceivedData() {
     this.hubConnection.on(ExpectedMessage.received_data, (data) => {
-      isDevMode() && console.log({data: data})
+      isDevMode() && console.log({received_data: data})
+    });
+  }
+
+  private manageValidationError() {
+    this.hubConnection.on(ExpectedMessage.validation_error, (data) => {
+      isDevMode() && console.log({validation_error: data})
     });
   }
 }

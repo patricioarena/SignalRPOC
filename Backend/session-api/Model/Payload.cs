@@ -1,5 +1,4 @@
-﻿using session_api.Result;
-using session_api.Service;
+﻿using session_api.Service;
 
 namespace session_api.Model;
 
@@ -26,26 +25,17 @@ public class Payload
     public string pageUrl
     {
         get { return url1; }
-        set { url1 = SetEncodeUrl(value); }
+        set { url1 = value; }
     }
 
     public string pictureUrl
     {
         get { return picture1; }
-        set { picture1 = SetEncodeUrl(value); }
+        set { picture1 = value; }
     }
 
     public string GetDecodeUrl() => Decode.Base64Url(this.url1);
+
     public string GetDecodePictureUrl() => Decode.Base64Url(this.picture1);
 
-    public string SetEncodeUrl(string value)
-    {
-        if (Validator.IsValidBase64Url.Test(value))
-            return value;
-
-        if (Validator.IsValidUrl.Test(value))
-            return value;
-
-        throw new CustomException(CustomException.ErrorsEnum.Base64UrlNotFound);
-    }
 }

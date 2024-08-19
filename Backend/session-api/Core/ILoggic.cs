@@ -9,9 +9,10 @@ namespace session_api.Core
         void SetCurrentConnection(UserConnection userConnection);
         Task SynchronizeRemoveData(UserConnection userConnection);
         Task SynchronizeUpdateData(Payload payload);
-        void LogTaskError(string methodName, Task task);
+        void LogTaskFaulted(string methodName, Task task);
         Task<List<User>> GetUsersForUrl(string url);
-        List<User> GetConnectionUserWithFiter(string base64URL, int? exclude);
+        Task<List<User>> GetConnectionUserWithFiterAsync(string base64URL, int? exclude);
+        Task<User> GetUserByUserId(int userId);
     }
 }
 

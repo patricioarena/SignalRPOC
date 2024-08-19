@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using session_api.IService;
+using session_api.Contant;
 using session_api.Signal;
 
 namespace session_api.Controllers
@@ -11,13 +11,11 @@ namespace session_api.Controllers
     [ApiExplorerSettings(IgnoreApi = false)]
     public class NotificationController : ControllerBase
     {
-        private IHubContext<SignalHub> _hubContext;
-        public IUserService _mySessionService { get; set; }
+        private readonly IHubContext<SignalHub> _hubContext;
 
-        public NotificationController(IHubContext<SignalHub> hubContext, IUserService mySessionService)
+        public NotificationController(IHubContext<SignalHub> hubContext)
         {
             _hubContext = hubContext;
-            _mySessionService = mySessionService;
         }
 
         [HttpGet("send/message/to/all")]

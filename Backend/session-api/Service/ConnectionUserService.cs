@@ -1,23 +1,39 @@
-﻿using session_api.IService;
+﻿using Microsoft.Extensions.Configuration;
+using session_api.IService;
 using session_api.Model;
 using session_api.Result;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace session_api.Service
 {
     public class ConnectionUserService : IConnectionUserService
     {
-        private ConcurrentDictionary<string, UserUrl> connectionUser = new ConcurrentDictionary<string, UserUrl>()
-        {
-            ["-eswoeZl3ao8hLANGQwZEQ"] = new UserUrl(3456, "http://localhost:4200/"),
-            ["H_KEV01cQrFzJdBN-Fx6lA"] = new UserUrl(6788, "http://localhost:4200/"),
-            ["-eswoeZl3ao8hLANGQwZdQ"] = new UserUrl(3456, "http://localhost:4201/"),
-            ["H_KEV01cQrFzJdBN-Fx4lA"] = new UserUrl(6788, "http://localhost:4201/")
-        };
+        private readonly IConfiguration _configuration;
 
-        public ConnectionUserService() { }
+        private ConcurrentDictionary<string, UserUrl> connectionUser = new ConcurrentDictionary<string, UserUrl>();
+
+        public ConnectionUserService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            UrlListConnectionsMock();
+        }
+
+        private void UrlListConnectionsMock()
+        {
+            ConcurrentDictionary<string, UserUrl> connectionUserMock = new ConcurrentDictionary<string, UserUrl>()
+            {
+                ["-eswoeZl3ao8hLANGQwZEQ"] = new UserUrl(3456, "http://localhost:4200/"),
+                ["H_KEV01cQrFzJdBN-Fx6lA"] = new UserUrl(6788, "http://localhost:4200/"),
+                ["-eswoeZl3ao8hLANGQwZdQ"] = new UserUrl(3456, "http://localhost:4201/"),
+                ["H_KEV01cQrFzJdBN-Fx4lA"] = new UserUrl(6788, "http://localhost:4201/")
+            };
+
+            if (_configuration.GetValue<bool>("Mock:PreLoadData"))
+                connectionUser.Concat(connectionUserMock);
+        }
 
         public ConcurrentDictionary<string, UserUrl> GetAllConnectionUserMappings() => connectionUser;
 

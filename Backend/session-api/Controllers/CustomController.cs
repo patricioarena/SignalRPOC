@@ -25,13 +25,23 @@ namespace session_api.Controllers
                 var errorCode = ((CustomException)e).ErrorCode;
                 var message = ((CustomException)e).Message;
                 _Logger.LogError($"Error: {errorCode}, Message: {message}");
-                return StatusCode((int)HttpStatusCode.PreconditionFailed, new Response<object>(HttpStatusCode.PreconditionFailed,
-                    "ha ocurrido un error", null, e.InnerException != null ? e.InnerException.Message : message, errorCode));
+
+                return StatusCode((int)HttpStatusCode.PreconditionFailed, Response<object, object>.Builder()
+                    .SetStatusCode(HttpStatusCode.PreconditionFailed)
+                    .SetMessage("Ha ocurrido un error")
+                    .SetData(null)
+                    .SetDeveloperMessage(e.InnerException != null ? e.InnerException.Message : message)
+                    .SetErrorCode(errorCode)
+                    .Build());
             }
             else
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, new Response<object>(HttpStatusCode.InternalServerError,
-                    "ha ocurrido un error", null, e.InnerException != null ? e.InnerException.Message : e.Message));
+                return StatusCode((int)HttpStatusCode.InternalServerError, Response<object, object>.Builder()
+                    .SetStatusCode(HttpStatusCode.InternalServerError)
+                    .SetMessage("Ha ocurrido un error")
+                    .SetData(null)
+                    .SetDeveloperMessage(e.InnerException != null ? e.InnerException.Message : e.Message)
+                    .Build());
             }
         }
     }

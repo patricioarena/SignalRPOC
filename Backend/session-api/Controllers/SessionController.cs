@@ -7,6 +7,7 @@ using session_api.Model;
 using session_api.Result;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 
 namespace session_api.Controllers
 {
@@ -20,10 +21,10 @@ namespace session_api.Controllers
     [ApiExplorerSettings(IgnoreApi = false)]
     public class SessionController : CustomController
     {
-        private IUserService _userService { get; set; }
-        private IUrlConnectionService _urlConnectionService { get; set; }
-        private IConnectionUserService _connectionUserService { get; set; }
-        private ILoggic _loggic { get; set; }
+        private readonly IUserService _userService;
+        private readonly IUrlConnectionService _urlConnectionService;
+        private readonly IConnectionUserService _connectionUserService;
+        private readonly ILoggic _loggic;
 
         public SessionController(
             ILogger<SessionController> _logger,
@@ -52,7 +53,12 @@ namespace session_api.Controllers
         [HttpGet("get/all/users/connected")]
         public IActionResult GetUsers()
         {
-            return Ok(new Response<ConcurrentDictionary<int, User>>(_userService.GetAllConnectedUsers()));
+            var response = Response<ConcurrentDictionary<int, User>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_userService.GetAllConnectedUsers())
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -69,7 +75,12 @@ namespace session_api.Controllers
         [HttpGet("get/all/urls/with/connections")]
         public IActionResult GetUrlListConnections()
         {
-            return Ok(new Response<ConcurrentDictionary<string, List<string>>>(_urlConnectionService.GetAllUrlsWithConnections()));
+            var response = Response<ConcurrentDictionary<string, List<string>>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_urlConnectionService.GetAllUrlsWithConnections())
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -86,7 +97,12 @@ namespace session_api.Controllers
         [HttpGet("get/all/connection/user/mappings")]
         public IActionResult GetConnectionUser()
         {
-            return Ok(new Response<ConcurrentDictionary<string, UserUrl>>(_connectionUserService.GetAllConnectionUserMappings()));
+            var response = Response<ConcurrentDictionary<string, UserUrl>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_connectionUserService.GetAllConnectionUserMappings())
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -110,8 +126,12 @@ namespace session_api.Controllers
         [HttpGet("get/user/for/pageUrl/{base64URL}")]
         public IActionResult GetConnectionUser(string base64URL, int? exclude = null)
         {
-            var users = _loggic.GetConnectionUserWithFiter(base64URL, exclude);
-            return Ok(new Response<List<User>>(users));
+            var response = Response<List<User>, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(_loggic.GetConnectionUserWithFiterAsync(base64URL, exclude).Result)
+                .Build();
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -128,7 +148,10 @@ namespace session_api.Controllers
         [HttpPost("transform/pageUrl/to/base64URL")]
         public IActionResult TransformUrlToBase64Url([FromBody] InputUrl inputUrl)
         {
-            return Ok(new List<InputUrl> { inputUrl });
+            return Ok(Response<InputUrl, object>.Builder()
+                .SetStatusCode(HttpStatusCode.OK)
+                .SetData(inputUrl)
+                .Build());
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
