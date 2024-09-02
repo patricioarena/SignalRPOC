@@ -116,7 +116,7 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(async task =>
                 {
-                    LogTaskFaulted(nameof(_connectionUserService.GetUserUrlByConnectionId), task);
+                    LogTaskFaulted(nameof(extractUniqueUserUrls), task);
 
                     if (task.IsFaulted)
                         await Task.FromException(task.Exception);
@@ -125,7 +125,7 @@ namespace session_api.Core
                 .Unwrap()
                 .ContinueWith(task =>
                 {
-                    LogTaskFaulted(nameof(_userService.GetUserByUserIdAsync), task);
+                    LogTaskFaulted(nameof(extractUserOfUniqueUserUrls), task);
 
                     if (task.IsFaulted)
                     {
@@ -177,7 +177,7 @@ namespace session_api.Core
         private List<User> RandomMockEngine()
         {
             Random random = new Random();
-            int numberOfRandomElements = random.Next(2, 6);
+            int numberOfRandomElements = random.Next(5, 9);
 
             return MockGetListUser()
                 .OrderBy(x => random.Next())
@@ -189,111 +189,111 @@ namespace session_api.Core
         {
             new User
             {
-                userId = 1341,
-                username = "CyberPhoenix",
-                picture = "https://mighty.tools/mockmind-api/content/human/65.jpg",
-                mail = "cyberphoenix@example.com",
-                fullname = "Phoenix Blaze",
-                position = "Software Engineer",
+                userId = 2,
+                username = "FISCALIA\\nahuel",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/2",
+                mail = "nahuel@fepba.gov.ar",
+                fullname = "Milanesi, Gabriel Nahuel",
+                position = "Director",
                 role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3g", "DT89mQ4bFYHq7PpUOEfY9h" }
             },
             new User
             {
-                userId = 1552,
-                username = "PixelWarrior",
-                picture = "https://mighty.tools/mockmind-api/content/human/45.jpg",
-                mail = "pixelwarrior@example.com",
-                fullname = "Warren Pixels",
-                position = "Graphic Designer",
+                userId = 4,
+                username = "FISCALIA\\pcasco",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/4",
+                mail = "pcasco@fepba.gov.ar",
+                fullname = "Gonzalez Casco, Pablo Andrés",
+                position = "Ingeniero",
                 role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
             {
-                userId = 1233,
-                username = "QuantumRider",
-                picture = "https://mighty.tools/mockmind-api/content/human/49.jpg",
-                mail = "quantumrider@example.com",
-                fullname = "Quinn Rider",
-                position = "Data Scientist",
+                userId = 5,
+                username = "FISCALIA\\csolan",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/5",
+                mail = "cristina@fepba.gov.ar",
+                fullname = "Solan, Cristina Isabel",
+                position = "Analista Funcional",
                 role = "Moderator",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9j", "DT19mQ4bFYHq7PpUOEfY9k" }
             },
             new User
             {
-                userId = 1864,
-                username = "NeonSpecter",
-                picture = "https://mighty.tools/mockmind-api/content/human/4.jpg",
-                mail = "neonspecter@example.com",
-                fullname = "Samantha Specter",
-                position = "UI/UX Designer",
+                userId = 10596,
+                username = "FISCALIA\\parena",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10596",
+                mail = "parena@fepba.gov.ar",
+                fullname = "Arena, Patricio Ernesto Antonio",
+                position = "Desarrollador",
                 role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 1275,
-                username = "DarkPhoenix",
-                picture = "https://mighty.tools/mockmind-api/content/cartoon/7.jpg",
-                mail = "darkphoenix@example.com",
-                fullname = "Damian Phoenix",
-                position = "DevOps Engineer",
+                userId = 10627,
+                username = "FISCALIA\\mlambolla",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10627",
+                mail = "mlambolla@fepba.gov.ar",
+                fullname = "Lambolla, Mariano",
+                position = "Jefe de Departamento de Programación",
                 role = "Admin",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY3h", "DT89mQ4bFYHq7PpUOEfY9i" }
             },
             new User
             {
-                userId = 1176,
-                username = "PixelPerfect",
-                picture = "https://mighty.tools/mockmind-api/content/cartoon/10.jpg",
-                mail = "pixelperfect@example.com",
-                fullname = "Patricia Pixels",
-                position = "Photographer",
+                userId = 10653,
+                username = "FISCALIA\\fmeza",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10653",
+                mail = "fmeza@fepba.gov.ar",
+                fullname = "Meza, Fernando Martín",
+                position = "Técnico",
                 role = "User",
                 connections = new List<string> { "DT89mQ4bFYHq7PpUOEfY9j" }
             },
             new User
             {
-                userId = 1447,
-                username = "GenericPerson",
-                picture = "https://mighty.tools/mockmind-api/content/human/42.jpg",
-                mail = "genericperson@example.com",
-                fullname = "George Person",
-                position = "Content Writer",
+                userId = 10659,
+                username = "FISCALIA\\fstachiotti",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10659",
+                mail = "stachiotti@fepba.gov.ar",
+                fullname = "Stacchiotti, Fabián César",
+                position = "Subsecretario",
                 role = "User",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 1208,
-                username = "NeoFox",
-                picture = "https://mighty.tools/mockmind-api/content/human/55.jpg",
-                mail = "neofox@example.com",
-                fullname = "Natalie Fox",
-                position = "Frontend Developer",
+                userId = 10660,
+                username = "FISCALIA\\mbailheres",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10660",
+                mail = "mbailheres@fepba.gov.ar",
+                fullname = "Bailheres, Maria Julia",
+                position = "Lic. en Comunicación Social/Jefa de Departamento",
                 role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 1489,
-                username = "Rick",
-                picture = "https://mighty.tools/mockmind-api/content/cartoon/11.jpg",
-                mail = "rick@example.com",
-                fullname = "Rick Sanchez",
-                position = "Scientist",
+                userId = 10665,
+                username = "FISCALIA\\cpierrard",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10665",
+                mail = "cpierrard@fepba.gov.ar",
+                fullname = "Pierrard, Cintia",
+                position = "Secretaria",
                 role = "Admin",
                 connections = new List<string> { "DT32mQ4bFYHq7PpUOEfY9k", "DT19mQ4bFYHq7PpUOEfY9l" }
             },
             new User
             {
-                userId = 1710,
-                username = "Morty",
-                picture = "https://mighty.tools/mockmind-api/content/human/56.jpg",
-                mail = "morty@example.com",
-                fullname = "Morty Smith",
-                position = "Student",
+                userId = 10686,
+                username = "FISCALIA\\acorredera",
+                picture = "https://serviciosdev.fepba.gov.ar/directorio/api/Avatar/user/10686",
+                mail = "acorredera@fepba.gov.ar",
+                fullname = "Corredera, Agostina Paula",
+                position = "Administrativa",
                 role = "User",
                 connections = new List<string> { "DT39mQ5bFYHq7PpUOEfY9l" }
             }
