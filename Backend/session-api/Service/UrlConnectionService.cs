@@ -16,24 +16,16 @@ namespace session_api.Service
 
         private readonly IConfiguration _configuration;
 
-        private ConcurrentDictionary<string, List<string>> urlListConnections = new ConcurrentDictionary<string, List<string>>();
+        private ConcurrentDictionary<string, List<string>> urlListConnections = new ConcurrentDictionary<string, List<string>>()
+        {
+            //["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
+            //["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
+        };
+
         public UrlConnectionService(ILogger<UrlConnectionService> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
-            UrlListConnectionsMock();
-        }
-
-        private void UrlListConnectionsMock()
-        {
-            ConcurrentDictionary<string, List<string>> urlListConnectionsMock = new ConcurrentDictionary<string, List<string>>()
-            {
-                ["http://localhost:4200/"] = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "H_KEV01cQrFzJdBN-Fx6lA" },
-                ["http://localhost:4201/"] = new List<string> { "-eswoeZl3ao8hLANGQwZdQ", "H_KEV01cXrFzJdBN-Fx4lA" }
-            };
-
-            if (_configuration.GetValue<bool>("Mock:PreLoadData"))
-                urlListConnections.Concat(urlListConnectionsMock);
         }
 
         public ConcurrentDictionary<string, List<string>> GetAllUrlsWithConnections() => urlListConnections;

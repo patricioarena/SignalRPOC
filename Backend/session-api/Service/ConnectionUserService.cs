@@ -13,26 +13,17 @@ namespace session_api.Service
     {
         private readonly IConfiguration _configuration;
 
-        private ConcurrentDictionary<string, UserUrl> connectionUser = new ConcurrentDictionary<string, UserUrl>();
+        private ConcurrentDictionary<string, UserUrl> connectionUser = new ConcurrentDictionary<string, UserUrl>()
+        {
+            //["-eswoeZl3ao8hLANGQwZEQ"] = new UserUrl(3456, "http://localhost:4200/"),
+            //["H_KEV01cQrFzJdBN-Fx6lA"] = new UserUrl(6788, "http://localhost:4200/"),
+            //["-eswoeZl3ao8hLANGQwZdQ"] = new UserUrl(3456, "http://localhost:4201/"),
+            //["H_KEV01cQrFzJdBN-Fx4lA"] = new UserUrl(6788, "http://localhost:4201/")
+        };
 
         public ConnectionUserService(IConfiguration configuration)
         {
             _configuration = configuration;
-            UrlListConnectionsMock();
-        }
-
-        private void UrlListConnectionsMock()
-        {
-            ConcurrentDictionary<string, UserUrl> connectionUserMock = new ConcurrentDictionary<string, UserUrl>()
-            {
-                ["-eswoeZl3ao8hLANGQwZEQ"] = new UserUrl(3456, "http://localhost:4200/"),
-                ["H_KEV01cQrFzJdBN-Fx6lA"] = new UserUrl(6788, "http://localhost:4200/"),
-                ["-eswoeZl3ao8hLANGQwZdQ"] = new UserUrl(3456, "http://localhost:4201/"),
-                ["H_KEV01cQrFzJdBN-Fx4lA"] = new UserUrl(6788, "http://localhost:4201/")
-            };
-
-            if (_configuration.GetValue<bool>("Mock:PreLoadData"))
-                connectionUser.Concat(connectionUserMock);
         }
 
         public ConcurrentDictionary<string, UserUrl> GetAllConnectionUserMappings() => connectionUser;

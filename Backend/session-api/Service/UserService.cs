@@ -16,45 +16,36 @@ namespace session_api.Service
 
         private readonly IConfiguration _configuration;
 
-        private ConcurrentDictionary<int, User> users = new ConcurrentDictionary<int, User>();
+        private ConcurrentDictionary<int, User> users = new ConcurrentDictionary<int, User>()
+        {
+            //[3456] = new User
+            //{
+            //    userId = 3456,
+            //    username = "NeutralPhoenix",
+            //    picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
+            //    mail = "neutralphoenix@example.com",
+            //    fullname = "Erik Phoenix",
+            //    position = "Software Engineer",
+            //    role = "Admin",
+            //    connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
+            //},
+            //[6788] = new User
+            //{
+            //    userId = 6788,
+            //    username = "TheProfesor",
+            //    picture = "https://pm1.aminoapps.com/6437/03d7f5b0003df2e7a8b94ae5a5ef553548d344b6_00.jpg",
+            //    mail = "theprofesor@marvel.com",
+            //    fullname = "Charles Xavier",
+            //    position = "Profesor",
+            //    role = "Admin",
+            //    connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
+            //}
+        };
 
         public UserService(ILogger<UserService> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
-            UsersMock();
-        }
-
-        private void UsersMock()
-        {
-            ConcurrentDictionary<int, User> usersMock = new ConcurrentDictionary<int, User>()
-            {
-                [3456] = new User
-                {
-                    userId = 3456,
-                    username = "NeutralPhoenix",
-                    picture = "https://i.pinimg.com/736x/75/2d/0b/752d0bc66695c9dacd6858d38adeaec4.jpg",
-                    mail = "neutralphoenix@example.com",
-                    fullname = "Erik Phoenix",
-                    position = "Software Engineer",
-                    role = "Admin",
-                    connections = new List<string> { "-eswoeZl3ao8hLANGQwZEQ", "-eswoeZl3ao8hLANGQwZdQ" }
-                },
-                [6788] = new User
-                {
-                    userId = 6788,
-                    username = "TheProfesor",
-                    picture = "https://pm1.aminoapps.com/6437/03d7f5b0003df2e7a8b94ae5a5ef553548d344b6_00.jpg",
-                    mail = "theprofesor@marvel.com",
-                    fullname = "Charles Xavier",
-                    position = "Profesor",
-                    role = "Admin",
-                    connections = new List<string> { "H_KEV01cQrFzJdBN-Fx6lA", "H_KEV01cXrFzJdBN-Fx4lA" }
-                }
-            };
-
-            if (_configuration.GetValue<bool>("Mock:PreLoadData"))
-                users.Concat(usersMock);
         }
 
         public ConcurrentDictionary<int, User> GetAllConnectedUsers() => users;
