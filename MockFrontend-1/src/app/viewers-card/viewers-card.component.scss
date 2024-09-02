@@ -1,0 +1,372 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&display=swap');
+
+/*========== Contenedor Principal ==========*/
+.viewers-container {
+  position: relative;
+  display: grid;
+  padding: 10px;
+  background-color: var(--container-color);
+  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+  max-width: 300px;
+}
+
+/*========== Boton de mas usuarios en el contenedor ==========*/
+.viewers-container-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+
+  .detail-more-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 6px;
+    transition: color 0.3sgit pull ease, transform 0.3s ease;
+
+    .button-content{
+      display: flex;
+      align-items: center;
+
+      span.user-count {
+        font-size: 14px;
+        color: var(--button-color)
+      }
+
+      i.more-icon {
+        font-size: 17px;
+        fill: var(--button-color);
+      }
+
+    }
+
+    &:hover {
+      color: var(--button-color);
+      transform: scale(1.1);
+    }
+
+    &:focus {
+      outline: none;
+      color: var(--button-color-focus);
+    }
+
+    &:active {
+      color: var(--button-color-active);
+      transform: scale(1);
+    }
+  }
+}
+
+/*========== Menu Desplegable ==========*/
+.dropdown-menu {
+  position: absolute;
+  background-color: var(--body-color);
+  border: 0.5px solid var(--gray-color);
+  border-radius: 5px;
+  //box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  right: 0;
+  bottom: 0;
+  transform: translateY(100%);
+
+  .dropdown-item {
+    padding: 5px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    //box-shadow: 0 6px 6px var(--card-tooltip-color-shadow);
+    //transition: box-shadow 0.3s ease;
+
+    // &:hover {
+    // opacity: 1;
+    // pointer-events: auto;
+    // box-shadow: 0 0 4px 4px var(--card-tooltip-color-shadow);
+    // }
+    &:hover {
+      background: hsl(200, 30%, 95%);
+      border-radius: 5px;
+    }
+
+    .dropdown-item-content{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 5px;
+
+      .viewer-item-image {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+
+        img.viewer-item-img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          margin-top: 3px;
+          margin-left: 3px;
+        }
+
+        .viewer-item-status {
+          width: 7px;
+          height: 7px;
+          background-color: var(--second-color);
+          position: absolute;
+          top: 7px;
+          right: 2px;
+          border-radius: 50%;
+          border: 1px solid var(--card-status-color);
+        }
+      }
+
+      .dropdown-item-body {
+        padding: 5px;
+        margin-left: 5px;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        flex-grow: 1;
+
+        h2.viewer-item-nameuser,
+        h3.viewer-item-email,
+        h3.viewer-item-positionjob {
+          margin: 2px 0;
+          font-family: var(--body-font);
+          color: var(--text-color);
+          font-weight: 300;
+        }
+
+        h2.viewer-item-nameuser {
+          font-size: var(--h2-font-size);
+          color: var(--title-color);
+        }
+
+        h3.viewer-item-email,
+        h3.viewer-item-positionjob {
+          font-size: var(--h3-font-size);
+        }
+      }
+    }
+
+    .dropdown-item-footer {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: auto;
+      padding: 5px;
+
+      .detail-viewer-button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin-right: 4px;
+        margin-left: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease, transform 0.3s ease;
+
+        i {
+          // width: 24px;
+          // height: 24px;
+          margin-left: 5px;
+          margin-right: 5px;
+          fill: var(--button-color);
+        }
+
+        &:hover {
+          color: var(--button-color);
+          transform: scale(1.1);
+        }
+
+        &:focus {
+          outline: none;
+          color: var(--button-color-focus);
+        }
+
+        &:active {
+          color: var(--button-color-active);
+          transform: scale(1);
+        }
+      }
+    }
+  }
+}
+
+/*========== Miniaturas de los usuarios ==========*/
+.viewer-thumbnail-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+  margin: 7px;
+  z-index: 1;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  .viewer-thumbnail-image {
+    .viewer-thumbnail-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--thumbnail-image-border-color);
+      box-shadow: 0 0 0 1px var(--thumbnail-image-border-color-shadow);
+      transition: box-shadow 0.3s ease;
+
+      &:hover {
+        border-color: var(--container-color);
+        box-shadow: 0 0 4px 4px rgba(82, 81, 81, 0.3);
+      }
+    }
+  }
+}
+
+/*========== Tooltip de las tarjetas de los usuarios ==========*/
+.viewer-card-tooltip-container {
+  position: absolute;
+  pointer-events: none;
+  //opacity: 0;
+  padding: 5px;
+
+  .viewer-card-tooltip {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    background-color: var(--body-color);
+    box-shadow: 0 8px 16px var(--card-tooltip-color-shadow);
+    border-radius: 5px;
+    border: 1px solid var(--gray-color);
+    width: 100%;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      opacity: 1;
+      pointer-events: auto;
+      box-shadow: 0 0 4px 4px var(--card-tooltip-color-shadow);
+    }
+
+    .viewer-card-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      //justify-content: flex-start;
+      width: 100%;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 5px;
+
+      .viewer-card-image {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+
+        img.viewer-card-img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          margin-top: 3px;
+          margin-left: 3px;
+        }
+
+        .viewer-card-status {
+          width: 7px;
+          height: 7px;
+          background-color: var(--second-color);
+          position: absolute;
+          top: 7px;
+          right: 2px;
+          border-radius: 50%;
+          border: 1px solid var(--card-status-color);
+        }
+      }
+
+      .viewer-card-body {
+        padding: 5px;
+        margin-left: 5px;
+        display: flex;
+        flex-direction: column;
+        padding: 5px;
+        text-align: left;
+        flex-grow: 1;
+
+        h2.viewer-card-nameuser,
+        h3.viewer-card-email,
+        h3.viewer-card-positionjob {
+          margin: 2px 0;
+          font-family: var(--body-font);
+          color: var(--text-color);
+          font-weight: 300;
+        }
+
+        h2.viewer-card-nameuser {
+          font-size: var(--h2-font-size);
+          color: var(--title-color);
+        }
+
+        h3.viewer-card-email,
+        h3.viewer-card-positionjob {
+          font-size: var(--h3-font-size);
+        }
+      }
+    }
+
+    .viewer-card-footer {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: auto;
+      padding: 5px;
+
+      .detail-viewer-button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin-right: 4px;
+        margin-left: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease, transform 0.3s ease;
+
+        i {
+          // width: 24px;
+          // height: 24px;
+          margin-left: 5px;
+          margin-right: 5px;
+          fill: var(--button-color);
+        }
+
+        &:hover {
+          color: var(--button-color);
+          transform: scale(1.1);
+        }
+
+        &:focus {
+          outline: none;
+          color: var(--button-color-focus);
+        }
+
+        &:active {
+          color: var(--button-color-active);
+          transform: scale(1);
+        }
+      }
+    }
+  }
+}
+
+.viewer-thumbnail-wrapper:hover .viewer-card-tooltip-container,
+.viewer-card-tooltip-container:hover {
+  opacity: 1;
+  pointer-events: auto;
+}

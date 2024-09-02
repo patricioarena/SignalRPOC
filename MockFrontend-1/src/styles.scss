@@ -1,1 +1,51 @@
-/* You can add global styles to this file, and also import other style files */
+/*=============== GOOGLE FONTS ===============*/
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css');
+
+/*=============== VARIABLES SCSS ===============*/
+$first-color: hsl(230, 100%, 50%);
+$second-color: hsl(150, 100%, 38%);
+$title-color: hsl(230, 24%, 12%);
+$text-color: hsl(230, 4%, 60%);
+$gray-color: hsl(230, 24%, 88%);
+$border-color: hsl(230, 4%, 92%);
+$body-color: hsl(230, 100%, 98%);
+$container-color: hsl(0, 0%, 100%);
+$thumbnail-image-border-color: hsl(120, 66%, 30%);
+$thumbnail-image-border-color-shadow: hsla(145, 96%, 18%, 0.274);
+$card-tooltip-color-shadow: hsla(0, 0.62%, 31.96%, 0.3);
+$card-status-color: hsl(120, 100%, 99%);
+$button-color: hsl(211, 100%, 50%);
+$button-color-focus: hsl(211, 100%, 35%);
+$button-color-active: hsl(212, 100%, 29%);
+$change: 15%;
+
+$body-font: 'Syne', sans-serif;
+$h2-font-size: 14px;
+$h3-font-size: 13px;
+$normal-font-size: 12px;
+
+/*=============== VARIABLES CSS ===============*/
+:root {
+  --first-color: #{$first-color};
+  --first-color-dark: #{darken($first-color, $change)};
+  --second-color: #{$second-color};
+  --title-color: #{$title-color};
+  --text-color: #{$text-color};
+  --gray-color: #{$gray-color};
+  --border-color: #{$border-color};
+  --body-color: #{$body-color};
+  --container-color: #{$container-color};
+  --thumbnail-image-border-color: #{$thumbnail-image-border-color};
+  --thumbnail-image-border-color-shadow: #{$thumbnail-image-border-color-shadow};
+  --card-tooltip-color-shadow: #{$card-tooltip-color-shadow};
+  --card-status-color: #{$card-status-color};
+  --button-color: #{$button-color};
+  --button-color-focus: #{$button-color-focus};
+  --button-color-active: #{$button-color-active};
+
+  --body-font: '#{$body-font}';
+  --h2-font-size: #{$h2-font-size};
+  --h3-font-size: #{$h3-font-size};
+  --normal-font-size: #{$normal-font-size};
+}
